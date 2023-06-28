@@ -1,0 +1,51 @@
+# wait
+model: 'custom'
+model_dir: 'data/model'
+network: 'res'
+heads: ''
+task: 'pvnet_parallel'
+gpus: (0, 1, 2, 3)
+resume: true
+
+train:
+    optim: 'adam'
+    lr: 1e-3
+    epoch: 240
+    milestones: (20, 40, 60, 80, 100, 120, 160, 180, 200, 220)
+    gamma: 0.5
+    batch_size: 32
+    dataset_dir: 'data/custom'
+    cropresize_rate: 1.0
+    rotate_rate: 0.5
+    rotate_min_z: -30
+    rotate_max_z: 30
+    weight_decay: 0.
+    batch_sampler: 'image_size'
+    image_sampler_minh: 720 #126
+    image_sampler_minw: 1280 #224
+    image_sampler_maxh: 720 #126
+    image_sampler_maxw: 1280 #224
+    overlap_ratio: 1.
+    negative_prob: 0.0
+    resize_ratio_min: 1.
+    resize_ratio_max: 1.
+    num_workers: 2
+    bg_prob: 0.5
+    max_x_tilt: 10
+    tod_crop_size: [224, 126, 30]
+    mirroring_prob: 0.5
+    kp_loss_threshold: 5.
+    kp_loss_beta: 2.
+    soft_ap_beta: 0.1
+    ransac_rounds: 256
+    target_entropy: 6
+    dsac_alpha: 0.1
+    dsac_beta: 0.1
+    dsac_threshold: 0.1
+    use_epipolar: False
+    use_dsac: False
+test:
+    dataset_dir: 'data/custom'
+    batch_size: 1
+    batch_sampler: 'image_size'
+    ransac_rounds: 1024

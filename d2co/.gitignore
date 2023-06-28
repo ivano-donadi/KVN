@@ -1,0 +1,13 @@
+*.~
+.*/
+*.kdev4
+
+externals/
+cv_ext/
+lib/
+build/
+misc/
+nbproject/
+bin/
+/cmake-build-debug/
+/cmake-build-release/

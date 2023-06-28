@@ -1,0 +1,63 @@
+PVNet Dtasets
+
+A typical PVNet  dataset folder should containt 3 empty foldera (mask/, pose/, rgb/) with mask, rgb images and ground truth positions of the objects, respectively. The folder should also contain the 3D cad model of the object (with name model.ply), a file that just reports the diameter in meters of a sphere inscribing the object (diameter.txt), and file that reports the calibration matrix K in space separataed format, with column-major order:
+
+k11 k12 k13
+k21 k22 k33
+k31 k32 k33
+
+Here an example of the folder tree:
+
+├── output/pvnet/dataset/folder
+│   ├── model.ply
+│   ├── camera.txt
+│   ├── diameter.txt
+│   ├── rgb/
+│   │   ├── 0.jpg
+│   │   ├── ...
+│   │   ├── 1234.jpg
+│   │   ├── ...
+│   ├── mask/
+│   │   ├── 0.png
+│   │   ├── ...
+│   │   ├── 1234.png
+│   │   ├── ...
+│   ├── pose/
+│   │   ├── pose0.npy
+│   │   ├── ...
+│   │   ├── pose1234.npy
+│   │   ├── ...
+│   │   └──
+
+
+It is possible to synthetically generate datasets from a CAD models using the generate_pvnet_dataset applications
+
+# Network training
+
+To train a model, you have first to prepare the data (<dataset_folder>) with the command:
+
+$ python3 run.py --type custom <dataset_folder>
+
+Then you can start the trainig phase with the command:
+
+python3 train_net.py --cfg_file configs/custom.yaml model_dir <model_folder> train.batch_size <batch_size> train.dataset_dir <train dataset_dir> test.dataset_dir <test dataset_dir> 
+
+Where:
+
+<model_folder> is the directory where the models will be stored
+<batch_size> is the number of images used to train the networ at each iteration
+<train dataset_dir> and <test dataset_dir> are the train and test dataset folders, respectively, prepared with the command python3 run.py --type custom_test.
+In most cases <train dataset_dir> and <test dataset_dir> are the same folder
+
+# Network testing (with visualization)
+
+To test the trained network over a set of images stored in the folder <dataset_folder>, use command:
+
+python3 run.py --type visualize --cfg_file configs/custom.yaml model_dir <model_folder> test.dataset_dir <dataset_folder> [test.epoch <epoch_number>]
+
+Where:
+
+<model_folder> is the directory where the trained models have been stored
+<test dataset_dir> is the images folder
+<epoch_number> is the optional model epoch number (E.g., if you want to use the model file 123.pth, use 123 as  <epoch_number>)
+               if not provided, the test will be performed using the model with the highest epoch number

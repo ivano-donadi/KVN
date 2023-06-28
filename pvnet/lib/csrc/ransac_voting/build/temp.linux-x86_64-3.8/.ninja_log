@@ -1,0 +1,9 @@
+# ninja log v5
+0	28288	1660297048131163071	/home/ivano/Desktop/pvnet/StereoPVNet/pvnet/lib/csrc/ransac_voting/build/temp.linux-x86_64-3.8/src/ransac_voting.o	2bf045bbad4eadf2
+1	13046	1660297066442506472	/home/ivano/Desktop/pvnet/StereoPVNet/pvnet/lib/csrc/ransac_voting/build/temp.linux-x86_64-3.8/src/ransac_voting_kernel.o	254b355799e9c7fc
+3	13837	1660297752040937262	/home/ivano/Desktop/pvnet/StereoPVNet/pvnet/lib/csrc/ransac_voting/build/temp.linux-x86_64-3.8/src/ransac_voting_kernel.o	254b355799e9c7fc
+2	26725	1660297821790932834	/home/ivano/Desktop/pvnet/StereoPVNet/pvnet/lib/csrc/ransac_voting/build/temp.linux-x86_64-3.8/src/ransac_voting.o	2bf045bbad4eadf2
+51	27962	1661962495515053964	/home/ivano/Desktop/pvnet/StereoPVNet/pvnet/lib/csrc/ransac_voting/build/temp.linux-x86_64-3.8/src/ransac_voting_kernel.o	254b355799e9c7fc
+50	39266	1661962506811418231	/home/ivano/Desktop/pvnet/StereoPVNet/pvnet/lib/csrc/ransac_voting/build/temp.linux-x86_64-3.8/src/ransac_voting.o	2bf045bbad4eadf2
+201	21636	1662372369481445545	/home/ivano/Desktop/pvnet/StereoPVNet/pvnet/lib/csrc/ransac_voting/build/temp.linux-x86_64-3.8/src/ransac_voting_kernel.o	254b355799e9c7fc
+201	38011	1662372385849446238	/home/ivano/Desktop/pvnet/StereoPVNet/pvnet/lib/csrc/ransac_voting/build/temp.linux-x86_64-3.8/src/ransac_voting.o	2bf045bbad4eadf2
