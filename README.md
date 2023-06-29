@@ -54,12 +54,12 @@ $ python3 setup.py build_ext --inplace --force
 
 ## TOD dataset
 
-To replicate the experiments presented in the paper you will first need to download the origianl TOD dataset, available at  [here](https://sites.google.com/view/keypose/home). The zip file for each object should be unzipped inside the `data/` directory and renamed to add a `_orig` suffix. For example, the original dataset for object 'ball_0' should be in `data/ball_0_orig`. To convert TOD's annotation into KVNet format, you can use the script `convert_all_textures` which is located inside `pvent/tod_utils`, which requires the path to the data folder and the name of the object. Assuming to have a terminal window inside `pvnet/tod_utils`, and assuming that we want to convert the dataset for the object `ball_0`, the command to use is the following:
+To replicate the experiments presented in the paper you will first need to download the origianl TOD dataset, available at  [here](https://sites.google.com/view/keypose/home). The zip file for each object should be unzipped inside the `data/` directory and renamed to add a `_orig` suffix. For example, the original dataset for object 'heart_0' should be in `data/heart_0_orig`. To convert TOD's annotation into KVNet format, you can use the script `convert_all_textures` which is located inside `pvent/tod_utils`, which requires the *absolute* path to the data folder and the name of the object. Assuming to have a terminal window inside `pvnet/tod_utils`, and assuming that we want to convert the dataset for the object `heart_0`, the command to use is the following:
 
 ```bash
-$ sh convert_all_textures.sh ../../data ball_0
+$ sh convert_all_textures.sh ~/KVNet/data heart_0
 ```
-This process might take a while, since it has to generate all ground truth object egmentation masks for the right camera images. Metadata such as keypoints 3D position and object models is taken from the corresponding folder inside `data/metafiles`. The generated annotations are stored inside `data/sy_datasets` divided by object and texture. For example, the annotations for the object ball_0 when the training textures are 1-9 and the test texture is texture 0 are stored inside `data/sy_datasets/ball_0_stereo_0`.
+This process might take a while, since it has to generate all ground truth object egmentation masks for the right camera images. Metadata such as keypoints 3D position and object models is taken from the corresponding folder inside `data/metafiles`. The generated annotations are stored inside `data/sy_datasets` divided by object and texture. For example, the annotations for the object heart_0 when the training textures are 1-9 and the test texture is texture 0 are stored inside `data/sy_datasets/heart_0_stereo_0`.
 
 ## KVNet training 
 
@@ -93,10 +93,10 @@ $ python3 pvnet_train_parallel.py -h
     You need at least to provide an input training dataset and to specify the output directory where the trained models will be stored.The best model checkpoint will be stored inside the best_model subdirectory
 ```
 
-For example, following the procedure at the previous section, it is possible to train the model on textures 1-9 of object ball_0 by using:
+For example, following the procedure at the previous section, it is possible to train the model on textures 1-9 of object heart_0 by using:
 
 ```bash
-python3 pvnet_train_parallel.py -d ../data/sy_datasets/ball_0_stereo_0 -m ../results -n 150 -e 10 -s 10 --cfg_file configs/custom_dsac.yaml
+python3 pvnet_train_parallel.py -d ../data/sy_datasets/heart_0_stereo_0 -m ../results -n 150 -e 10 -s 10 --cfg_file configs/custom_dsac.yaml
 ```
 
 This command will train the model using DSAC as the training loss and will save a checkpoint every 10 epochs inside the results folder, named 9.pth, 19.pth and so on. The checkpoint with the best validation parameters is saved inside `results/best_model`. To perform the same training but with PVNet's l1 vote loss you simply need to choose `configs/custom_vanilla.yaml` as the configuration file. Additionally, it is possible to perform random background augmentation by expliciting the `--bkg_imgs` option with the path to the backgrounds dataset. We provide the set of backgrounds that were used in our experiments at [this link](). #### TODO: add link 
@@ -104,7 +104,7 @@ In case of correct execution, the output of this script will be the network's tr
 
 ## KVNet evaluation
 
-Assuming to have completed the training procedure at the previous section, it is now possible to evaluate the trained model on tecture 0 of object ball_0 with the `pvnet_eval_parallel.py` script:
+Assuming to have completed the training procedure at the previous section, it is now possible to evaluate the trained model on tecture 0 of object heart_0 with the `pvnet_eval_parallel.py` script:
 
 ```bash
 $ python3 pvnet_eval_parallel.py -h
@@ -125,27 +125,41 @@ $ python3 pvnet_eval_parallel.py -h
 In the case of the current example it should be used in the following way (assuming that the best checkpoint is 89.pth):
 
 ```bash
-$ python3 pvnet_eval_parallel.py -d ../data/sy_datasets/ball_0_stereo_0 -m ../results/best_model/89.pth --cfg_file configs/custom_dsac.yaml
+$ python3 pvnet_eval_parallel.py -d ../data/sy_datasets/heart_0_stereo_0 -m ../results/best_model/89.pth --cfg_file configs/custom_dsac.yaml
 ```
 
 If you are evaluating a model trained with the classical PVNet loss, then you just need to specify `configs/custom_vanilla.yaml` as the configuration file.
-The output of this script will be the evaluation results both using monocular images and stereo images.
+The output of this script will be the *quantitative* evaluation results both using monocular images and stereo images.
+
+#### Note:
+
+During the evaluation, it is completely normal to recieve the following message, especially when evaluating a model in the early stages of training:
+
+```
+levenberg_marquardt_strategy.cc:114] Linear solver failure. Failed to compute a step: Eigen LLT decomposition failed.
+```
 
 ## KVNet prediction visualization
+
+To obtain a qualitative evaluation of the trained model on a test dataset, you can use the `pvnet_test_localization_parallel.py` script, which will show, for every image of the test dataset, both ground truth and predicted 3d object bounding boxes and the reprojections of the estimated 3d keypoints on the left camera image.
 
 ```bash
 $ python3 pvnet_test_localization_parallel.py -h
 
-    usage: pvnet_test_localization_parallel.py [-h] -l MODEL -f META_FILE -i IMAGE [--cfg_file CFG_FILE] ...
+    usage: pvnet_test_localization_parallel.py [-h] -d DATASET_DIR -m MODEL [--cfg_file CFG_FILE] ...
 
     Locate an object from an input image
 
     -h, --help            show this help message and exit
-    -l MODEL, --model MODEL
+    -d DATASET_DIR, --dataset_dir DATASET_DIR
+                            Input directory containing the test dataset
+    -m MODEL, --model MODEL
                             KVNet trained model
-    -f META_FILE, --meta_file META_FILE
-                            PVNet inference meta file (e.g., inference_meta.yaml)
-    -i IMAGE, --image IMAGE
-                            Input image or folder (e.g., image.jpg or images/)
     --cfg_file CFG_FILE   Low level configuration file, DO NOT CHANGE THIS PARAMETER IF YOU ARE NOT SURE (default = configs/custom_dsac.yaml)
+```
+
+With the same assumptions of our previous examples, it is possible to use this script to visualize predictions for the texture 0 of the object heart_0 with the following command:
+
+```bash
+$ python3 pvnet_test_localization_parallel.py -m ../results/best_model/89.pth -d ../data/sy_datasets/heart_0_stereo_0 --cfg_file configs/custom_dsac.yaml 
 ```

@@ -69,7 +69,7 @@ def main(cfg):
       if len(os.listdir(best_model_dir)) < 1:
           bestepoch = 0
       else:
-          bestepoch = [int(x.split("_")[0]) for x in os.listdir(best_model_dir) if x.endswith(".pth")][0]
+          bestepoch = [int(x.split(".")[0]) for x in os.listdir(best_model_dir) if x.endswith(".pth")][0]
       
     eval_stats_fn = os.path.join(cfg.model_dir, 'eval_stats.json')
     
@@ -82,7 +82,7 @@ def main(cfg):
     test_evaluator, _ = make_evaluators(cfg)
     validation_loader, train_loader = make_data_loaders(cfg)
 
-    begin_epochs = load_model(network, optimizer, scheduler, recorder, cfg.model_dir, resume=cfg.resume, suffix='_L')
+    begin_epochs = load_model(network, optimizer, scheduler, recorder, cfg.model_dir, resume=cfg.resume, suffix='')
 
     if not recorder.best_loss:
         recorder.best_loss = None
@@ -114,7 +114,7 @@ def main(cfg):
 
 
         if (epoch + 1) % cfg.save_ep == 0:
-            save_model(network, optimizer, scheduler, recorder, epoch, cfg.model_dir, suffix='_L')
+            save_model(network, optimizer, scheduler, recorder, epoch, cfg.model_dir, suffix='')
 
         if (epoch + 1) % cfg.eval_ep == 0:
 
@@ -125,27 +125,27 @@ def main(cfg):
                 with open(eval_stats_fn, 'r') as eval_stats:
                     old_stats = json.load(eval_stats)
             else:
-                old_stats = {'proj2d_L': 0.0, 'add_L': 0.0, 'proj2d_R':0.0, 'add_R': 0.0} 
+                old_stats = {'proj2d': 0.0, 'add': 0.0} 
             
             new_score = (new_stats['proj2d'] + new_stats['add'])/2;
-            old_score = (old_stats['proj2d'+'_L'] + old_stats['add'+'_L'])/2;
+            old_score = (old_stats['proj2d'] + old_stats['add'])/2;
 
                 
 
             if new_score > old_score :
                 # split at suffix underscore
-                filetype = '_L'+'.pth'
-                pths = [int(pth.split('_')[0]) for pth in os.listdir(best_model_dir)  if filetype in pth]
+                filetype = '.pth'
+                pths = [int(pth.split('.')[0]) for pth in os.listdir(best_model_dir)  if filetype in pth]
                 if pths :
                     os.system('rm {}'.format(os.path.join(best_model_dir, ('{}' + filetype).format(min(pths)))))
-                save_model(network, optimizer, scheduler, recorder, epoch, best_model_dir, suffix = '_L')
+                save_model(network, optimizer, scheduler, recorder, epoch, best_model_dir, suffix = '')
 
                 # do not overwrite stats from other net
                 new_proj = new_stats['proj2d']
                 new_add = new_stats['add']
                 new_stats = old_stats
-                new_stats['proj2d'+'_L'] = new_proj
-                new_stats['add'+'_L'] = new_add
+                new_stats['proj2d'] = new_proj
+                new_stats['add'] = new_add
                 with open(eval_stats_fn, 'w') as eval_stats:
                     json.dump(new_stats, eval_stats)
 

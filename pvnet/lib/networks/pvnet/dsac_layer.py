@@ -372,12 +372,10 @@ class DSACFunction(Function):
                 #### dlogpj = a * (dsj/dv - E_j' dsj'/dv)
                 dl_dvp = torch.zeros_like(vertex[bi])
                 # the 2 here is the contribution of x and y components of vertex
-                dhpscores_dvert_all, dhpscores_db_all, dhpscores_dt_all = ds_dv(all_coords, all_direct, hp[bi], ctx.a, ctx.b, ctx.t, ds_dvh) #[vn, rn, tn, 2], [vn, rn]
+                dhpscores_dvert_all, _, _ = ds_dv(all_coords, all_direct, hp[bi], ctx.a, ctx.b, ctx.t, ds_dvh) #[vn, rn, tn, 2], [vn, rn]
                 for k in range(vn):
                     # clamp invalid hypotheses losses
                     dhpscores_dvert_all[k, cur_valid[:,k].logical_not(),:,:] = torch.clamp(dhpscores_dvert_all[k, cur_valid[:,k].logical_not(),:,:],-invalid_loss, invalid_loss )
-                    dhpscores_dt_all[k, cur_valid[:,k].logical_not()] = 0.
-                    dhpscores_db_all[k, cur_valid[:,k].logical_not()] = 0.
                 
                 dhpscores_dvert_exp = torch.sum(dhpscores_dvert_all * cur_probs.unsqueeze(2).unsqueeze(3), dim = 1, keepdim=True) #[vn, 1, tn, 2]
                 dp_dvert = ctx.a * (dhpscores_dvert_all - dhpscores_dvert_exp) #[vn, rn, tn, 2]
