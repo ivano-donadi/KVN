@@ -16,17 +16,15 @@ from tools.inference_parallel import Inference
 if __name__ == '__main__':	
     parser = argparse.ArgumentParser(description='Locate an object from an input image')
     
-    parser.add_argument('-l', '--left_model',  
-                        help='PVNet trained model on left image (e.g., model_L.pth)', required=True)
-    parser.add_argument('-r', '--right_model',  
-                        help='PVNet trained model on right image (e.g., model_R.pth)', required=True)
+    parser.add_argument('-l', '--model',  
+                        help='KVNet trained model', required=True)
     parser.add_argument('-f', '--meta_file', 
                         help='PVNet inference meta file (e.g., inference_meta.yaml)', required=True)
     parser.add_argument('-i', '--image', 
                         help='Input image or folder (e.g., image.jpg or images/)', required=True)
     parser.add_argument("--cfg_file", 
-                        help='Low level configuration file, DO NOT CHANGE THIS PARAMETER IF YOU ARE NOT SURE (default = configs/custom_parallel.yaml)', 
-                        default="configs/custom_parallel.yaml", type=str)
+                        help='Low level configuration file, DO NOT CHANGE THIS PARAMETER IF YOU ARE NOT SURE (default = configs/custom_dsac.yaml)', 
+                        default="configs/custom_dsac.yaml", type=str)
     
     parser.add_argument("opts", default=None, nargs=argparse.REMAINDER)
     args = parser.parse_args()
@@ -34,7 +32,7 @@ if __name__ == '__main__':
     cfg = make_cfg(args)
     setup_cfg(cfg)
     
-    inference = Inference(args.left_model, args.right_model, args.meta_file, cfg.heads.vote_dim, cfg.heads.seg_dim, True)
+    inference = Inference(args.left_model, args.meta_file, cfg.heads.vote_dim, cfg.heads.seg_dim, True)
     
     if(os.path.isdir(args.image)):
       files = [f for f in listdir(args.image) if isfile(join(args.image, f))]

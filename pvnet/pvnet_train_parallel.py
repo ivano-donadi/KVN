@@ -157,11 +157,10 @@ def main(cfg):
 
 if __name__ == "__main__":
     
-    parser = argparse.ArgumentParser(description='PVNet training tool',
+    parser = argparse.ArgumentParser(description='KVNet training tool',
                                      epilog="You need at least to provide an input training dataset "
-                                            "(e.g. generated with the generate_pvnet_dataset app) "
                                             "and to specify the output directory where the trained models will be stored."
-                                            "The best model directory will be stored inside the best_model subdirectory")
+                                            "The best model checkpoint will be stored inside the best_model subdirectory")
 
     parser.add_argument('-d', '--dataset_dir', 
                         help='Input directory containing the training dataset', 
@@ -180,8 +179,8 @@ if __name__ == "__main__":
                         help='Optional background images directory, to be used to augment the dataset', default = '')
     parser.add_argument('--disable_resume', action='store_true', help='If specified, disable train resume and start a new train')
     parser.add_argument("--cfg_file", 
-                        help='Low level configuration file, DO NOT CHANGE THIS PARAMETER IF YOU ARE NOT SURE (default = configs/custom.yaml)', 
-                        default="configs/custom_parallel.yaml", type=str)
+                        help='Low level configuration file, DO NOT CHANGE THIS PARAMETER IF YOU ARE NOT SURE (default = configs/custom_dsac.yaml)', 
+                        default="configs/custom_dsac.yaml", type=str)
     parser.add_argument("opts", default=None, nargs=argparse.REMAINDER)
     
     args = parser.parse_args()

@@ -1,4 +1,3 @@
-from . import transforms_stereo as tfs
 from . import transforms as tfp
 from . import samplers
 import torch
@@ -84,10 +83,8 @@ def make_data_loader(cfg, is_train=True, is_distributed=False, max_iter=-1, bkg_
 
     dataset_dir = cfg.train.dataset_dir if is_train else cfg.test.dataset_dir
 
-    if cfg.task == 'pvnet_stereo':
-        transforms = tfs.make_transforms(is_train, bkg_imgs_dir, cfg.train.bg_prob)
-    else:
-        transforms = tfp.make_transforms(is_train, bkg_imgs_dir, cfg.train.bg_prob)
+    
+    transforms = tfp.make_transforms(is_train, bkg_imgs_dir, cfg.train.bg_prob)
 
     dataset = make_dataset(cfg, dataset_dir, transforms, json_fn, is_train, LR_split)
     sampler = make_data_sampler(dataset, shuffle)

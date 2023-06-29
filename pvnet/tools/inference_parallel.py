@@ -21,17 +21,13 @@ from lib.utils.pvnet import pvnet_pose_utils
 
 class Inference(object):
 
-    def __init__(self, trained_model_fn_L, trained_model_fn_R, inference_meta_fn, 
+    def __init__(self, trained_model_fn, inference_meta_fn, 
                  vote_dim = 18, seg_dim = 2, vis=False ) :
 
-      self.network_L = get_res_pvnet(vote_dim, seg_dim).cuda()
-      self.network_R = get_res_pvnet(vote_dim, seg_dim).cuda()
-      pretrained_model_L = torch.load(trained_model_fn_L)
-      pretrained_model_R = torch.load(trained_model_fn_R)
-      self.network_L.load_state_dict(pretrained_model_L['net'], True)
-      self.network_R.load_state_dict(pretrained_model_R['net'], True)
-      self.network_L.eval()
-      self.network_R.eval()
+      self.network = get_res_pvnet(vote_dim, seg_dim).cuda()
+      pretrained_model = torch.load(trained_model_fn)
+      self.network.load_state_dict(pretrained_model['net'], True)
+      self.network.eval()
       
       K, baseline, corner_3d, center_3d, fps_3d = read_inference_meta_stereo( inference_meta_fn )
       
@@ -59,12 +55,14 @@ class Inference(object):
       data_L = data_L.cuda()
       data_R = torch.tensor([transf_img_R])
       data_R = data_R.cuda()
+
+      batch = {'inp_L': data_L, 'inp_R': data_R}
+
       with torch.no_grad():
-        output_L = self.network_L(data_L)
-        output_R = self.network_R(data_R)
+        output = self.network(batch)
       
-      kpt_2d_L = output_L['kpt_2d'][0].detach().cpu().numpy()
-      kpt_2d_R = output_R['kpt_2d'][0].detach().cpu().numpy()
+      kpt_2d_L = output['kpt_2d_L'][0].detach().cpu().numpy()
+      kpt_2d_R = output['kpt_2d_R'][0].detach().cpu().numpy()
 
       R, t = pvnet_pose_utils.iterative_pnp(self.K, self.baseline, img_L.size[0], img_L.size[1], kpt_2d_L, kpt_2d_R, self.kpt_3d)
 

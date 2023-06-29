@@ -4,8 +4,8 @@
 ## Prerequisites (tested on Ubuntu 20.04)
 
  - Python 3.8
- - CUDA drivers 11.6 or higher
- - cuDNN libraries 8.7.0 or higher
+ - CUDA drivers (tested on version 11.6)
+ - cuDNN libraries (tested on vesion 8.7.0)
  - ceres sover (tested on version 1.14.0)
 
 ### required libraries
@@ -59,92 +59,93 @@ To replicate the experiments presented in the paper you will first need to downl
 ```bash
 $ sh convert_all_textures.sh ../../data ball_0
 ```
-This process might take a while, since it has to generate all ground truth object egmentation masks for the right camera images. Metadata such as keypoints 3D position and object models is taken from the corresponding folder inside `data/metafiles`. The generated annotations are stored inside `data/sy_datasets` divided by object and texture. For example, the annotations for the object ball_0 when the training textures are 1-9 and the test texture is texture 0 are stored inside `data/sy_datasets/ball_0_texture_0`.
+This process might take a while, since it has to generate all ground truth object egmentation masks for the right camera images. Metadata such as keypoints 3D position and object models is taken from the corresponding folder inside `data/metafiles`. The generated annotations are stored inside `data/sy_datasets` divided by object and texture. For example, the annotations for the object ball_0 when the training textures are 1-9 and the test texture is texture 0 are stored inside `data/sy_datasets/ball_0_stereo_0`.
 
-## PVNet Object Localizer
+## KVNet training 
 
-PVNet is a data-driven based pose estimation method that requires labeled dataset to learn a model of the objects. A dataset is basically composed by images of the objects of interest and the related labels. Labels for pose estimation are represented by the 3D positions (translations and rotations) of the objects with respect to the camera frame.
+To train a model, ensure to have completed the TOD dataset annotation steps detailed above, then move to the `pvnet` directory. From here you can start training the model with the `pvnet_train_parallel.py` script:
 
-### PVNet datasets
+```bash
+$ python3 pvnet_train_parallel.py -h
 
-A typical PVNet  dataset folder should containt 3 empty folders (mask/, pose/, rgb/) with object black/white masks, rgb images and ground truth positions of the objects, respectively. The folder should also contain the 3D cad model of the object (with name model.ply), a file that just reports the diameter in meters of a sphere inscribing the object (diameter.txt), and file that reports the calibration matrix K in space separataed format, with column-major order:
+    usage: pvnet_train_parallel.py [-h] -d DATASET_DIR -m MODEL_DIR [-b BATCH_SIZE] [-n NUM_EPOCH] [-e EVAL_EP] [-s SAVE_EP] [--bkg_imgs_dir BKG_IMGS_DIR] [--disable_resume] [--cfg_file CFG_FILE]
 
-~~~
-k11 k12 k13
-k21 k22 k33
-k31 k32 k33
-~~~
+    KVNet training tool
 
-Here an example of the folder tree:
+    -h, --help            show this help message and exit
+    -d DATASET_DIR, --dataset_dir DATASET_DIR
+                            Input directory containing the training dataset
+    -m MODEL_DIR, --model_dir MODEL_DIR
+                            Output directory where the trained models will be stored
+    -b BATCH_SIZE, --batch_size BATCH_SIZE
+                            Number of training examples in one forward/backward pass (default = 2)
+    -n NUM_EPOCH, --num_epoch NUM_EPOCH
+                            Number of epochs to train (default = 240)
+    -e EVAL_EP, --eval_ep EVAL_EP
+                            Number of epochs after which to evaluate (and eventually save) the model (default = 5)
+    -s SAVE_EP, --save_ep SAVE_EP
+                            Number of epochs after which to save the model (default = 5)
+    --bkg_imgs_dir BKG_IMGS_DIR
+                            Optional background images directory, to be used to augment the dataset
+    --disable_resume      If specified, disable train resume and start a new train
+    --cfg_file CFG_FILE   Low level configuration file, DO NOT CHANGE THIS PARAMETER IF YOU ARE NOT SURE (default = configs/custom_dsac.yaml)
 
-~~~
-├── output/pvnet/dataset/folder
-│   ├── model.ply
-│   ├── camera.txt
-│   ├── diameter.txt
-│   ├── rgb/
-│   │   ├── 0.jpg
-│   │   ├── ...
-│   │   ├── 1234.jpg
-│   │   ├── ...
-│   ├── mask/
-│   │   ├── 0.png
-│   │   ├── ...
-│   │   ├── 1234.png
-│   │   ├── ...
-│   ├── pose/
-│   │   ├── pose0.npy
-│   │   ├── ...
-│   │   ├── pose1234.npy
-│   │   ├── ...
-│   │   └──
-~~~
+    You need at least to provide an input training dataset and to specify the output directory where the trained models will be stored.The best model checkpoint will be stored inside the best_model subdirectory
+```
 
-It is possible to synthetically generate datasets from a CAD models using the generate_pvnet_dataset application (see notes in the following of this guide).
+For example, following the procedure at the previous section, it is possible to train the model on textures 1-9 of object ball_0 by using:
 
-### PVNet network training
+```bash
+python3 pvnet_train_parallel.py -d ../data/sy_datasets/ball_0_stereo_0 -m ../results -n 150 -e 10 -s 10 --cfg_file configs/custom_dsac.yaml
+```
 
-To train a model, move to the object_localization/pvnet directory. First you have to prepare the dataset you want to use for training (contained in the &lt;dataset_folder&gt; direcotry) with the command:
+This command will train the model using DSAC as the training loss and will save a checkpoint every 10 epochs inside the results folder, named 9.pth, 19.pth and so on. The checkpoint with the best validation parameters is saved inside `results/best_model`. To perform the same training but with PVNet's l1 vote loss you simply need to choose `configs/custom_vanilla.yaml` as the configuration file. Additionally, it is possible to perform random background augmentation by expliciting the `--bkg_imgs` option with the path to the backgrounds dataset. We provide the set of backgrounds that were used in our experiments at [this link](). #### TODO: add link 
+In case of correct execution, the output of this script will be the network's training process and the evaluation results on the validation set at the specified epochs interval.
 
-~~~bash
-$ python3 run.py --type custom <dataset_folder>
-~~~
+## KVNet evaluation
 
-Then you can start the trainig phase with the command:
+Assuming to have completed the training procedure at the previous section, it is now possible to evaluate the trained model on tecture 0 of object ball_0 with the `pvnet_eval_parallel.py` script:
 
-~~~bash
-$ python3 train_net.py --cfg_file configs/custom.yaml model_dir <model_folder> train.batch_size \
-          <batch_size> train.dataset_dir <train dataset_dir> test.dataset_dir <test dataset_dir>
-~~~
+```bash
+$ python3 pvnet_eval_parallel.py -h
+    usage: pvnet_eval_parallel.py [-h] -d DATASET_DIR -m MODEL [--cfg_file CFG_FILE]
 
-Where:
+    KVNet evaluation tool
 
-~~~
-<model_folder> is the directory where the models will be stored
-<batch_size> is the number of images used to train the network at each iteration
-<train dataset_dir> and <test dataset_dir> are the train and test dataset folders, respectively,
-                                           prepared with the command   
-                                           $ python3 run.py --type custom_test ...
-~~~
+    -h, --help            show this help message and exit
+    -d DATASET_DIR, --dataset_dir DATASET_DIR
+                            Input directory containing the test dataset
+    -m MODEL, --model MODEL
+                            KVNet trained model
+    --cfg_file CFG_FILE   Low level configuration file, DO NOT CHANGE THIS PARAMETER IF YOU ARE NOT SURE (default = configs/custom_dsac.yaml)
 
-In most cases &lt;train dataset_dir&gt; and &lt;test dataset_dir&gt; are the same folder
+    You need at least to provide an (annotated) input test dataset and a KVNet trained model
+```
 
-### Network testing (with visualization)
+In the case of the current example it should be used in the following way (assuming that the best checkpoint is 89.pth):
 
-To test the trained network over a set of stored  images, use command:
+```bash
+$ python3 pvnet_eval_parallel.py -d ../data/sy_datasets/ball_0_stereo_0 -m ../results/best_model/89.pth --cfg_file configs/custom_dsac.yaml
+```
 
-~~~bash
-$ python3 run.py --type visualize --cfg_file configs/custom.yaml model_dir <model_folder> \
-          test.dataset_dir <dataset_folder> [test.epoch <epoch_number>]
-~~~
+If you are evaluating a model trained with the classical PVNet loss, then you just need to specify `configs/custom_vanilla.yaml` as the configuration file.
+The output of this script will be the evaluation results both using monocular images and stereo images.
 
-Where:
+## KVNet prediction visualization
 
-~~~
-<model_folder> is the directory where the trained models have been stored
-<test dataset_dir> is the images folder
-<epoch_number> is the optional model epoch number (E.g., if you want to use the model file 123.pth, 
-               use 123 as  <epoch_number>) if not provided, the test will be performed using the model 
-               with the highest epoch number.
-~~~
+```bash
+$ python3 pvnet_test_localization_parallel.py -h
 
+    usage: pvnet_test_localization_parallel.py [-h] -l MODEL -f META_FILE -i IMAGE [--cfg_file CFG_FILE] ...
+
+    Locate an object from an input image
+
+    -h, --help            show this help message and exit
+    -l MODEL, --model MODEL
+                            KVNet trained model
+    -f META_FILE, --meta_file META_FILE
+                            PVNet inference meta file (e.g., inference_meta.yaml)
+    -i IMAGE, --image IMAGE
+                            Input image or folder (e.g., image.jpg or images/)
+    --cfg_file CFG_FILE   Low level configuration file, DO NOT CHANGE THIS PARAMETER IF YOU ARE NOT SURE (default = configs/custom_dsac.yaml)
+```
