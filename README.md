@@ -5,8 +5,8 @@
 
  - Python 3.8
  - CUDA drivers (tested on version 11.6)
- - cuDNN libraries (tested on vesion 8.7.0)
- - ceres sover (tested on version 1.14.0)
+ - cuDNN libraries (tested on version 8.7.0)
+ - ceres solver (tested on version 1.14.0)
 
 ### required libraries
 
@@ -54,12 +54,12 @@ $ python3 setup.py build_ext --inplace --force
 
 ## TOD dataset
 
-To replicate the experiments presented in the paper you will first need to download the origianl TOD dataset, available at  [here](https://sites.google.com/view/keypose/home). The zip file for each object should be unzipped inside the `data/` directory and renamed to add a `_orig` suffix. For example, the original dataset for object 'heart_0' should be in `data/heart_0_orig`. To convert TOD's annotation into KVNet format, you can use the script `convert_all_textures` which is located inside `pvent/tod_utils`, which requires the *absolute* path to the data folder and the name of the object. Assuming to have a terminal window inside `pvnet/tod_utils`, and assuming that we want to convert the dataset for the object `heart_0`, the command to use is the following:
+To replicate the experiments presented in the paper you will first need to download the original TOD dataset, available at  [here](https://sites.google.com/view/keypose/home). The zip file for each object should be unzipped inside the `data/` directory and renamed to add a `_orig` suffix. For example, the original dataset for object 'heart_0' should be in `data/heart_0_orig`. To convert TOD's annotation into KVNet format, you can use the script `convert_all_textures` located inside `pvnet/tod_utils`, which requires the *absolute* path to the data folder and the name of the object. Assuming to have a terminal window inside `pvnet/tod_utils`, and assuming that we want to convert the dataset for the object `heart_0`, the command to use is the following:
 
 ```bash
 $ sh convert_all_textures.sh ~/KVNet/data heart_0
 ```
-This process might take a while, since it has to generate all ground truth object egmentation masks for the right camera images. Metadata such as keypoints 3D position and object models is taken from the corresponding folder inside `data/metafiles`. The generated annotations are stored inside `data/sy_datasets` divided by object and texture. For example, the annotations for the object heart_0 when the training textures are 1-9 and the test texture is texture 0 are stored inside `data/sy_datasets/heart_0_stereo_0`.
+This process might take a while since it has to generate all ground truth object segmentation masks for the right camera images. Metadata such as keypoints 3D position and object models is taken from the corresponding folder inside `data/metafiles`. The generated annotations are stored inside `data/sy_datasets` divided by object and texture. For example, the annotations for the object heart_0 when the training textures are 1-9 and the test texture is texture 0 are stored inside `data/sy_datasets/heart_0_stereo_0`.
 
 ## KVNet training 
 
@@ -99,7 +99,7 @@ For example, following the procedure at the previous section, it is possible to 
 python3 pvnet_train_parallel.py -d ../data/sy_datasets/heart_0_stereo_0 -m ../results -n 150 -e 10 -s 10 --cfg_file configs/custom_dsac.yaml
 ```
 
-This command will train the model using DSAC as the training loss and will save a checkpoint every 10 epochs inside the results folder, named 9.pth, 19.pth and so on. The checkpoint with the best validation parameters is saved inside `results/best_model`. To perform the same training but with PVNet's l1 vote loss you simply need to choose `configs/custom_vanilla.yaml` as the configuration file. Additionally, it is possible to perform random background augmentation by expliciting the `--bkg_imgs` option with the path to the backgrounds dataset. We provide the set of backgrounds that were used in our experiments at [this link](). #### TODO: add link 
+This command will train the model using DSAC as the training loss and will save a checkpoint every 10 epochs inside the results folder, named 9.pth, 19.pth and so on. The checkpoint with the best validation parameters is saved inside `results/best_model`. To perform the same training but with PVNet's l1 vote loss, you simply need to choose `configs/custom_vanilla.yaml` as the configuration file. Additionally, it is possible to perform random background augmentation by explicating the `--bkg_imgs` option with the path to the backgrounds dataset. We provide the set of backgrounds that were used in our experiments at [this link](https://drive.google.com/file/d/1lzxR0A8j0-2dvLwC3lPA-UcYSOw8uvwY/view?usp=sharing). 
 In case of correct execution, the output of this script will be the network's training process and the evaluation results on the validation set at the specified epochs interval.
 
 ## KVNet evaluation
@@ -163,3 +163,7 @@ With the same assumptions of our previous examples, it is possible to use this s
 ```bash
 $ python3 pvnet_test_localization_parallel.py -m ../results/best_model/89.pth -d ../data/sy_datasets/heart_0_stereo_0 --cfg_file configs/custom_dsac.yaml 
 ```
+
+## Trained models
+
+We provide the trained models for all 15 TOD objects at: ### TODO: add link
