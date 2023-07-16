@@ -1,4 +1,4 @@
-# KVNet: Keypoints Voting Network with Differentiable RANSAC for Stereo Pose Estimation
+# KVN: Keypoints Voting Network with Differentiable RANSAC for Stereo Pose Estimation
 
 
 ## Prerequisites (tested on Ubuntu 20.04)
@@ -54,14 +54,14 @@ $ python3 setup.py build_ext --inplace --force
 
 ## TOD dataset
 
-To replicate the experiments presented in the paper you will first need to download the original TOD dataset, available at  [here](https://sites.google.com/view/keypose/home). The zip file for each object should be unzipped inside the `data/` directory and renamed to add a `_orig` suffix. For example, the original dataset for object 'heart_0' should be in `data/heart_0_orig`. To convert TOD's annotation into KVNet format, you can use the script `convert_all_textures` located inside `pvnet/tod_utils`, which requires the *absolute* path to the data folder and the name of the object. Assuming to have a terminal window inside `pvnet/tod_utils`, and assuming that we want to convert the dataset for the object `heart_0`, the command to use is the following:
+To replicate the experiments presented in the paper you will first need to download the original TOD dataset, available at  [here](https://sites.google.com/view/keypose/home). The zip file for each object should be unzipped inside the `data/` directory and renamed to add a `_orig` suffix. For example, the original dataset for object 'heart_0' should be in `data/heart_0_orig`. To convert TOD's annotation into KVN format, you can use the script `convert_all_textures` located inside `pvnet/tod_utils`, which requires the *absolute* path to the data folder and the name of the object. Assuming to have a terminal window inside `pvnet/tod_utils`, and assuming that we want to convert the dataset for the object `heart_0`, the command to use is the following:
 
 ```bash
-$ sh convert_all_textures.sh ~/KVNet/data heart_0
+$ sh convert_all_textures.sh ~/KVN/data heart_0
 ```
 This process might take a while since it has to generate all ground truth object segmentation masks for the right camera images. Metadata such as keypoints 3D position and object models is taken from the corresponding folder inside `data/metafiles`. The generated annotations are stored inside `data/sy_datasets` divided by object and texture. For example, the annotations for the object heart_0 when the training textures are 1-9 and the test texture is texture 0 are stored inside `data/sy_datasets/heart_0_stereo_0`.
 
-## KVNet training 
+## KVN training 
 
 To train a model, ensure to have completed the TOD dataset annotation steps detailed above, then move to the `pvnet` directory. From here you can start training the model with the `pvnet_train_parallel.py` script:
 
@@ -70,7 +70,7 @@ $ python3 pvnet_train_parallel.py -h
 
     usage: pvnet_train_parallel.py [-h] -d DATASET_DIR -m MODEL_DIR [-b BATCH_SIZE] [-n NUM_EPOCH] [-e EVAL_EP] [-s SAVE_EP] [--bkg_imgs_dir BKG_IMGS_DIR] [--disable_resume] [--cfg_file CFG_FILE]
 
-    KVNet training tool
+    KVN training tool
 
     -h, --help            show this help message and exit
     -d DATASET_DIR, --dataset_dir DATASET_DIR
@@ -102,7 +102,7 @@ python3 pvnet_train_parallel.py -d ../data/sy_datasets/heart_0_stereo_0 -m ../re
 This command will train the model using DSAC as the training loss and will save a checkpoint every 10 epochs inside the results folder, named 9.pth, 19.pth and so on. The checkpoint with the best validation parameters is saved inside `results/best_model`. To perform the same training but with PVNet's l1 vote loss, you simply need to choose `configs/custom_vanilla.yaml` as the configuration file. Additionally, it is possible to perform random background augmentation by explicating the `--bkg_imgs` option with the path to the backgrounds dataset. We provide the set of backgrounds that were used in our experiments at [this link](https://drive.google.com/file/d/1lzxR0A8j0-2dvLwC3lPA-UcYSOw8uvwY/view?usp=sharing). 
 In case of correct execution, the output of this script will be the network's training process and the evaluation results on the validation set at the specified epochs interval.
 
-## KVNet evaluation
+## KVN evaluation
 
 Assuming to have completed the training procedure at the previous section, it is now possible to evaluate the trained model on tecture 0 of object heart_0 with the `pvnet_eval_parallel.py` script:
 
@@ -110,16 +110,16 @@ Assuming to have completed the training procedure at the previous section, it is
 $ python3 pvnet_eval_parallel.py -h
     usage: pvnet_eval_parallel.py [-h] -d DATASET_DIR -m MODEL [--cfg_file CFG_FILE]
 
-    KVNet evaluation tool
+    KVN evaluation tool
 
     -h, --help            show this help message and exit
     -d DATASET_DIR, --dataset_dir DATASET_DIR
                             Input directory containing the test dataset
     -m MODEL, --model MODEL
-                            KVNet trained model
+                            KVN trained model
     --cfg_file CFG_FILE   Low level configuration file, DO NOT CHANGE THIS PARAMETER IF YOU ARE NOT SURE (default = configs/custom_dsac.yaml)
 
-    You need at least to provide an (annotated) input test dataset and a KVNet trained model
+    You need at least to provide an (annotated) input test dataset and a KVN trained model
 ```
 
 In the case of the current example it should be used in the following way (assuming that the best checkpoint is 89.pth):
@@ -139,7 +139,7 @@ During the evaluation, it is completely normal to recieve the following message,
 levenberg_marquardt_strategy.cc:114] Linear solver failure. Failed to compute a step: Eigen LLT decomposition failed.
 ```
 
-## KVNet prediction visualization
+## KVN prediction visualization
 
 To obtain a qualitative evaluation of the trained model on a test dataset, you can use the `pvnet_test_localization_parallel.py` script, which will show, for every image of the test dataset, both ground truth and predicted 3d object bounding boxes and the reprojections of the estimated 3d keypoints on the left camera image.
 
@@ -154,7 +154,7 @@ $ python3 pvnet_test_localization_parallel.py -h
     -d DATASET_DIR, --dataset_dir DATASET_DIR
                             Input directory containing the test dataset
     -m MODEL, --model MODEL
-                            KVNet trained model
+                            KVN trained model
     --cfg_file CFG_FILE   Low level configuration file, DO NOT CHANGE THIS PARAMETER IF YOU ARE NOT SURE (default = configs/custom_dsac.yaml)
 ```
 
