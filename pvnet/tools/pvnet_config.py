@@ -27,6 +27,11 @@ cfg.ep_iter = -1
 cfg.save_ep = 5
 cfg.eval_ep = 5
 
+cfg.split = ''
+cfg.image_height = 0
+cfg.image_width = 0
+cfg.data = ''
+
 
 # -----------------------------------------------------------------------------
 # train
@@ -122,6 +127,7 @@ _heads_factory = {
     'pvnet': CN({'vote_dim': 18, 'seg_dim': 2}),
     'pvnet_stereo': CN({'vote_dim': 18, 'seg_dim': 2}),
     'pvnet_parallel': CN({'vote_dim': 18, 'seg_dim': 2}),
+    'stereo_obj_1m': CN({'vote_dim': 18, 'seg_dim': 2}),
     'ct': CN({'ct_hm': 30, 'wh': 2})
 }
 

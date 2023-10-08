@@ -23,17 +23,17 @@ def _dataset_factory(data_source, task, ):
 def make_dataset(cfg, dataset_dir, transforms, json_fn, is_train=True, LR_split=None):
     
     if(is_train) :
-      args = { 'id' : 'custom',
+      args = { 'id' : cfg.model,
                'data_root' : dataset_dir,
                'ann_file' : os.path.join(dataset_dir, json_fn),
-               'split' :'train',
+               'split' : cfg.split,
                'transforms' : transforms,
                'cfg': cfg }
     else :
-      args = { 'id' : 'custom',
+      args = { 'id' : cfg.model,
                'data_root' : dataset_dir,
                'ann_file' : os.path.join(dataset_dir, json_fn),
-               'split' : 'test',
+               'split' : cfg.split,
                'transforms' : transforms,
                'cfg': cfg }
 

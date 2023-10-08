@@ -91,7 +91,7 @@ class Trainer(object):
         data_size = len(data_loader)
         for batch in tqdm.tqdm(data_loader, total = data_size):
             for k in batch:
-                if k != 'meta':
+                if k != 'meta' and k != 'img_id':
                     batch[k] = batch[k].cuda()
 
             with torch.no_grad():

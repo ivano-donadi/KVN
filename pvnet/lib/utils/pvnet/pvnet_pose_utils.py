@@ -52,7 +52,7 @@ def iterative_pnp(K, baseline, img_width, img_height, kpt_2d_L, kpt_2d_R, var_L,
         PNPSolver = ip.PNPSolver()
     PNPSolver.setCamModel(K, img_width, img_height, baseline)
     PNPSolver.setInitialTransformation(initial_R.copy(), initial_t.copy())
-    
+
     if use_variance:
         r_mat, transl = PNPSolver.compute(kpt_3d, kpt_2d_L, kpt_2d_R, var_L, var_R)
     else:

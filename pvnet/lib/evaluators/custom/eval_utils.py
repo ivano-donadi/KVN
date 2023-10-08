@@ -99,10 +99,10 @@ def it_pnp_metrics(obj_model, obj_diameter, K, baseline, img_height, img_width, 
 
 def pose_metrics(r_mat, transl, gt_pose, obj_model, diameter, syn, K, obj_name = None):
 
-    if obj_name is not None:
-        tod_model = kps_for_obj(obj_name)
-        if tod_model is not None:
-            obj_model = tod_model
+    #if obj_name is not None:
+    #    tod_model = kps_for_obj(obj_name)
+    #    if tod_model is not None:
+    #        obj_model = tod_model
 
     pose_pred = np.c_[r_mat, transl]
     mean_dist = compute_mean_dist(obj_model, pose_pred, gt_pose, syn)
@@ -117,7 +117,7 @@ def pose_metrics(r_mat, transl, gt_pose, obj_model, diameter, syn, K, obj_name =
 def mask_iou(output, batch, seg_name = 'aux_mask_L', mask_name = 'mask_L'):
     #mask_pred = torch.argmax(output[seg_name], dim=1)[0].detach().cpu().numpy()
     mask_pred = output[seg_name].cpu().numpy()
-    mask_gt = batch[mask_name][0].detach().cpu().numpy()
+    mask_gt = batch[mask_name][0].detach().cpu().numpy().astype(np.int64)
     iou = (mask_pred & mask_gt).sum() / (mask_pred | mask_gt).sum()
     return (iou > 0.7)
 
