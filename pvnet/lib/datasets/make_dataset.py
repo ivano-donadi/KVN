@@ -78,7 +78,7 @@ def make_data_loader(cfg, is_train=True, is_distributed=False, max_iter=-1, bkg_
         drop_last = False
     else:
         batch_size = cfg.test.batch_size
-        shuffle = True if is_distributed else False
+        shuffle = True #if is_distributed else False
         drop_last = False
 
     dataset_dir = cfg.train.dataset_dir if is_train else cfg.test.dataset_dir

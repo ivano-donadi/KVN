@@ -31,9 +31,9 @@ train:
     resize_ratio_max: 1.
     num_workers: 2
     bg_prob: 0.5
-    max_x_tilt: 10
+    max_x_tilt: 5
     tod_crop_size: [224, 126, 30]
-    mirroring_prob: 0.5
+    mirroring_prob: 0.05
     kp_loss_threshold: 10000.
     kp_loss_beta: 100.
     soft_ap_beta: 0.1

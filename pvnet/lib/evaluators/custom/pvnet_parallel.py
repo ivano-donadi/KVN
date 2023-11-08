@@ -250,7 +250,7 @@ class StereoObj1MEvaluator:
         #self.evaluate(output_R, batch_R)
 
         obj_name = batch['img_id'][1]
-        K = batch['K'][0].detach().cpu().numpy() * (self.height/1440)
+        K = batch['K'][0].detach().cpu().numpy().astype(np.float64)
         baseline = batch['baseline'][0].item()
 
         pose_gt_L = batch['pose'][0].detach().cpu().numpy()
@@ -284,11 +284,11 @@ class StereoObj1MEvaluator:
         good_mask = eval_utils.mask_iou(output, batch)
         if False: #not good_mask and mae > 0.05: 
             visualize_tod_ann(batch['inp_L'][0].detach().cpu() ,batch['inp_L'][0].detach().cpu(),  batch['kpt_2d_L'][0].detach().cpu(),  output['kpt_2d_L'][0].detach().cpu(), batch['mask_L'][0].detach().cpu(),output['mask_L'][0].detach().cpu())
-            #visualize_tod_ann(batch['inp_R'][0].detach().cpu() ,batch['inp_R'][0].detach().cpu(),  batch['kpt_2d_R'][0].detach().cpu(),  output['kpt_2d_R'][0].detach().cpu(), batch['mask_R'][0].detach().cpu(),output['mask_R'][0].detach().cpu())
+            visualize_tod_ann(batch['inp_R'][0].detach().cpu() ,batch['inp_R'][0].detach().cpu(),  batch['kpt_2d_R'][0].detach().cpu(),  output['kpt_2d_R'][0].detach().cpu(), batch['mask_R'][0].detach().cpu(),output['mask_R'][0].detach().cpu())
             #visualize_3d_bbox(batch['inp_L'][0], anno['corner_3d_L'], K, pose_pred_it, pose_gt_L, offset_L)
             #visualize_error_maps(batch['vertex_L'], output['vertex_L'], batch['kpt_2d_L'],batch['mask_L'])
-            probs = torch.softmax(output['scores_L'][0], dim=0)
-            visualize_dsac_results(batch['inp_L'][0], output['keypoints_L'][0], probs, batch['kpt_2d_L'][0].detach().cpu()) 
+            #probs = torch.softmax(output['scores_L'][0], dim=0)
+            #visualize_dsac_results(batch['inp_L'][0], output['keypoints_L'][0], probs, batch['kpt_2d_L'][0].detach().cpu()) 
             #probs = torch.softmax(output['scores_R'][0], dim=0)
             #visualize_dsac_results(batch['inp_R'][0], output['keypoints_R'][0], probs, batch['kpt_2d_R'][0].detach().cpu()) 
 

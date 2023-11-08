@@ -63,8 +63,8 @@ def intersection_from_dir(p0,p1,n0,n1):
 
     #print(denx.max(), deny.max())
 
-    invalidx = x.isnan().logical_or(x.isinf()).logical_or(x <-224).logical_or(x > 2*224)
-    invalidy = y.isnan().logical_or(y.isinf()).logical_or(y <-126).logical_or(y > 2*126)
+    invalidx = x.isnan().logical_or(x.isinf()).logical_or(x <-224).logical_or(x > 2*640)
+    invalidy = y.isnan().logical_or(y.isinf()).logical_or(y <-126).logical_or(y > 2*640)
     invalidden = (denx.abs()<thresh).logical_or(deny.abs()<thresh)
     valid = (invalidx.logical_not()).logical_and((invalidy.logical_not())).logical_and(invalidden.logical_not())
 

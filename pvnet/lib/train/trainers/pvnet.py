@@ -32,11 +32,11 @@ class NetworkWrapper(nn.Module):
 
         for suffix in ['_L','_R']:
             
-            #weight = batch['mask'+suffix][:, None].float()
-            #curr_vote_loss = self.vote_crit(output['vertex'+suffix] * weight, batch['vertex'+suffix] * weight, reduction='sum')
-            #if weight.sum() > 0:
-            #    curr_vote_loss = curr_vote_loss / weight.sum() / batch['vertex'+suffix].size(1)
-            #vote_loss += curr_vote_loss
+            weight = batch['mask'+suffix][:, None].float()
+            curr_vote_loss = self.vote_crit(output['vertex'+suffix] * weight, batch['vertex'+suffix] * weight, reduction='sum')
+            if weight.sum() > 0:
+                curr_vote_loss = curr_vote_loss / weight.sum() / batch['vertex'+suffix].size(1)
+            vote_loss += curr_vote_loss
 
             mask = batch['mask'+suffix].long()
             curr_seg_loss = self.seg_crit(output['seg'+suffix], mask)
@@ -76,7 +76,7 @@ class NetworkWrapper(nn.Module):
         loss = vertex_loss + entropy_loss + seg_loss
 
         #visualize_dsac_results_split(batch['inp_L'][0], output['keypoints_L'][0], self.net.dist_from_scores(output['scores_L'])[0], batch['kpt_2d_L'][0].detach().cpu())
-        scalar_stats.update({'vote_loss': torch.zeros((1,)).detach().cpu(),  'seg_loss': seg_loss.detach().cpu(),  'vertex_loss': vertex_loss.detach().cpu()})
+        scalar_stats.update({'vote_loss': vote_loss.detach().cpu(),  'seg_loss': seg_loss.detach().cpu(),  'vertex_loss': vertex_loss.detach().cpu()})
         if self.use_dsac:
             scalar_stats.update({'entropy_loss': entropy_loss.detach().cpu(), 'kp_loss': kp_loss.detach().cpu()})
             if self.use_epipolar  and epoch > 49:

@@ -95,12 +95,50 @@ class RandomBlur(object):
             image = cv2.GaussianBlur(image, (sigma, sigma), 0)
         return image, R, t, K
 
+import os
+class RandomBackground(object):
 
-def make_transforms(is_train):
+    def __init__(self, directory, prob = 0.5):
+        if directory :
+          self.pths = [os.path.join(directory, pth) for pth in os.listdir(directory) ]
+          self.prob = prob
+        else :
+          self.pths = []
+          self.prob = prob
+            
+
+    def __call__(self, image, R, mask, K):
+        if self.pths and random.random()<self.prob:
+          bck_img = None
+          while bck_img is None:
+            bck_pth = random.sample(self.pths, 1)
+            bck_img = cv2.imread(bck_pth[0])
+          #bck_img = np.asarray(Image.open(bck_pth[0]));
+          if bck_img.shape[2] == 1 :
+            bck_img = cv2.cvtColor(bck_img, cv2.COLOR_GRAY2BGR )
+          elif bck_img.shape[2] == 4 :
+            bck_img = cv2.cvtColor(bck_img, cv2.COLOR_BGRA2BGR )
+            
+          size = (int(image.shape[1]), int(image.shape[0]));
+          bck_img = cv2.resize( bck_img, size);
+          fg = cv2.bitwise_and(image,image, mask=mask)
+          i_mask = abs(1-mask)
+          bg = cv2.bitwise_and(bck_img,bck_img, mask=i_mask)
+          image = cv2.add(fg,bg)
+          #cv2.imshow('image',image)
+          #cv2.waitKey(1000)
+
+        return image, R, mask, K
+
+
+
+def make_transforms(is_train,cfg):
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
+    print(cfg.train.bg_prob)
     if is_train is True:
         transform = Compose([
+            RandomBackground(prob=cfg.train.bg_prob,directory="/home/donadi/Desktop/pvnet/data_ar/textures"),
             RandomBlur(0.2),
             ColorJitter(0.1, 0.1, 0.05, 0.05),
             ToTensor(),

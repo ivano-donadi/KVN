@@ -417,3 +417,48 @@ def augmentation(rgb, mask, hcoords, height, width, split):
         ])
         rgb = test_img_transforms(Image.fromarray(np.ascontiguousarray(rgb, np.uint8)))
     return rgb, mask, hcoords
+
+def rotate_x_axis(img, mask, hcoords, homography):
+    dsize = (img.shape[1], img.shape[0])
+    warped_img = cv2.warpPerspective(img, homography, dsize)
+    warped_mask = cv2.warpPerspective(mask, homography, dsize)
+    hcoords_hom = np.dot(homography,hcoords.T).T
+    hcoords_hom = hcoords_hom / hcoords_hom[:,2:]
+    return warped_img, warped_mask, hcoords_hom
+
+def mirror_stereo_pair(img_L, img_R, mask_L, mask_R, hcoords_L, hcoords_R ):
+    width = img_L.shape[1]
+    # rotate 180
+    img_L = cv2.rotate(img_L, cv2.ROTATE_180)
+    img_R = cv2.rotate(img_R, cv2.ROTATE_180)
+    mask_L = cv2.rotate(mask_L, cv2.ROTATE_180)
+    mask_R = cv2.rotate(mask_R, cv2.ROTATE_180)
+    # flip vertical axis
+    img_L = cv2.flip(img_L, 0)
+    img_R = cv2.flip(img_R, 0)
+    mask_L = cv2.flip(mask_L,0)
+    mask_R = cv2.flip(mask_R,0)
+    # swap
+    img_L, img_R = img_R, img_L
+    mask_L, mask_R = mask_R, mask_L
+    # fix hcoords
+    hcoords_L[:,0] = width - hcoords_L[:,0]
+    hcoords_R[:,0] = width - hcoords_R[:,0]
+    # swap
+    hcoords_L, hcoords_R = hcoords_R, hcoords_L
+    return img_L, img_R, mask_L, mask_R, hcoords_L, hcoords_R
+
+def _augmentation_keep_epipolar_constraints(img_L,img_R, mask_L, mask_R, hcoords_L, hcoords_R, K, cfg):
+    # 1. randomly invert images and reflect them
+    do_mirroring = np.random.random() < cfg.train.mirroring_prob
+    if do_mirroring:
+        img_L, img_R, mask_L, mask_R, hcoords_L, hcoords_R = mirror_stereo_pair(img_L, img_R, mask_L, mask_R, hcoords_L, hcoords_R )
+    # 2. random tilt about x axis
+    theta = np.random.randint(-cfg.train.max_x_tilt, cfg.train.max_x_tilt)
+    theta = (theta * np.pi)/180 # to radians
+    R_mat = np.array([[1., 0., 0.], [0, np.cos(theta), -np.sin(theta)], [0, np.sin(theta), np.cos(theta) ]]).astype(np.float32)
+    Kinv = np.linalg.inv(K)
+    homography = np.matmul(K,np.matmul(R_mat, Kinv))
+    img_L, mask_L, hcoords_L = rotate_x_axis(img_L, mask_L, hcoords_L,homography)
+    img_R, mask_R, hcoords_R = rotate_x_axis(img_R, mask_R, hcoords_R,homography)
+    return img_L,img_R, mask_L, mask_R, hcoords_L, hcoords_R

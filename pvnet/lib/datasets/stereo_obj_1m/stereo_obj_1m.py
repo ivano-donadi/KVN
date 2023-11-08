@@ -9,9 +9,10 @@ import json
 import cv2
 from PIL import Image
 from . import data_utils
-from .augmentation import crop_or_padding_to_fixed_size, rotate_instance, crop_resize_instance_v1
+from .augmentation import crop_or_padding_to_fixed_size, rotate_instance, crop_resize_instance_v1, _augmentation_keep_epipolar_constraints
 import random
 import torch
+from lib.utils.pvnet import pvnet_data_utils
 from .transforms import make_transforms
 
 
@@ -46,6 +47,7 @@ class Dataset(data.Dataset):
 
     def __init__(self, data_root, ann_file, split, cfg, transforms=None, suffix = '',lr=True):
         super(Dataset, self).__init__()
+        print("starting dataset")
         args = cfg
         self.args = args
         self.height = args.image_height
@@ -83,14 +85,14 @@ class Dataset(data.Dataset):
         skipped = 0
         for subdir in filename_dict:
             for img_id in filename_dict[subdir]:
-                if not os.path.exists(os.path.join(self.stereobj_data_root, subdir, img_id + '.jpg')) or str(img_id) == "000426"  or str(img_id) == "001189":
+                if not os.path.exists(os.path.join(self.stereobj_data_root, subdir, img_id + '.jpg')) or str(img_id) == "000426"  or str(img_id) == "001189" or str(img_id) == "001087":
                     skipped += 1
                 else:
                     self.filenames.append([subdir, img_id])
         self.filenames.sort()
         print("Skipped",skipped,"of",skipped+len(self.filenames))
 
-        self._transforms = make_transforms(split=='train') #transforms
+        self._transforms = make_transforms(split=='train' or split == 'trainval',self.args) #transforms
         self.num_kp = args.num_kp
 
     def load_cam_params(self):
@@ -231,24 +233,45 @@ class Dataset(data.Dataset):
 
         inp_l, inp_r, kpt_2d_l, kpt_2d_r, mask_L, mask_R, R_gt, t_gt = self.read_data(img_id)
 
+        
+        alpha = self.height/1440
+        pre_mul = np.array([[alpha, 0., (alpha-1)/2],[0, alpha, (alpha-1)/2],[0.,0.,1.]])
+        
+        K = np.matmul(pre_mul, self.proj_matrix_l[:,:-1])
+
         view = False
-        if view:
-            import matplotlib.pyplot as plt
-            plt.imshow(inp_l / 255.)
-            plt.plot(kpt_2d_l[:, 0], kpt_2d_l[:, 1], 'ro')
-            plt.figure()
-            plt.imshow(inp_r / 255.)
-            plt.plot(kpt_2d_r[:, 0], kpt_2d_r[:, 1], 'ro')
-            plt.figure()
-            plt.imshow(mask_L)
-            plt.show()
-            exit()
+
+#        if self.split == "train" or self.split == "trainval":
+#            inp_l, inp_r, mask_L, mask_R, kpt_2d_l, kpt_2d_r = self.augment_stereo(inp_l, inp_r, mask_L, mask_R, kpt_2d_l, kpt_2d_r, K, None )
 
         if self._transforms is not None:
-            inp_l, kpt_2d_l, mask_L, K = self._transforms(inp_l, kpt_2d_l, mask_L, self.proj_matrix_l)
-            inp_r, kpt_2d_r, mask_R, K = self._transforms(inp_r, kpt_2d_r, mask_R, self.proj_matrix_r)
+            inp_l, kpt_2d_l, mask_L, K = self._transforms(inp_l, kpt_2d_l, mask_L, K)
+            inp_r, kpt_2d_r, mask_R, K = self._transforms(inp_r, kpt_2d_r, mask_R, K)
             mask_L.astype(np.uint8)
             mask_R.astype(np.uint8)
+
+        vertex_L = pvnet_data_utils.compute_vertex(mask_L, kpt_2d_l).transpose(2, 0, 1)
+        vertex_R = pvnet_data_utils.compute_vertex(mask_R, kpt_2d_r).transpose(2, 0, 1)
+
+
+        if view:
+            import matplotlib.pyplot as plt
+            _,ax = plt.subplots(1,2)
+            ax[0].imshow(inp_l*np.array([0.229, 0.224, 0.225])+np.array([0.485, 0.456, 0.406]))
+            ax[0].plot(kpt_2d_l[:, 0], kpt_2d_l[:, 1], 'ro')
+            ax[0].imshow(mask_L, alpha=0.25)
+            ax[1].imshow(inp_r*np.array([0.229, 0.224, 0.225])+np.array([0.485, 0.456, 0.406]))
+            ax[1].plot(kpt_2d_r[:, 0], kpt_2d_r[:, 1], 'ro')
+            ax[1].imshow(mask_R, alpha=0.25)
+            plt.show()
+            #plt.imshow(inp_l*np.array([0.229, 0.224, 0.225])+np.array([0.485, 0.456, 0.406]))
+            #plt.imshow(mask_L,alpha=0.5)
+            #plt.show()
+            #plt.imshow(inp_r*np.array([0.229, 0.224, 0.225])+np.array([0.485, 0.456, 0.406]))
+            #plt.imshow(mask_R,alpha=0.5)
+            #plt.show()
+            #exit()
+        
 
         if self.split != 'test':
             pose_gt = np.concatenate([R_gt, np.expand_dims(t_gt, -1)], axis=-1)
@@ -257,10 +280,11 @@ class Dataset(data.Dataset):
             pose_gt = []
             prob = []
 
-        ret = {'inp_L': inp_l.transpose(2,1,0), 'inp_R': inp_r.transpose(2,1,0), 'mask_L': mask_L, 'mask_R': mask_R,'prob': prob, \
+        ret = {'inp_L': inp_l.transpose(2,0,1), 'inp_R': inp_r.transpose(2,0,1), 'mask_L': mask_L, 'mask_R': mask_R,'prob': prob, \
                'kpt_2d_L': kpt_2d_l, 'kpt_2d_R': kpt_2d_r, 'img_id': img_id, 'meta': {}, \
                'kpt_3d': self.kps[:self.num_kp], 'baseline': self.baseline, \
-               'K': self.proj_matrix_l[:, :-1], 'pose': pose_gt, 'offset_L': np.array([0,0]), 'offset_R': np.array([0,0])}
+               'vertex_L': vertex_L, 'vertex_R': vertex_R,\
+               'K': K, 'pose': pose_gt, 'offset_L': np.array([0,0]), 'offset_R': np.array([0,0])}
         return ret
 
     def __len__(self):
@@ -283,6 +307,21 @@ class Dataset(data.Dataset):
         kpt_2d = hcoords[:, :2]
 
         return img, kpt_2d, mask
+    
+    def augment_stereo(self, img_L, img_R, mask_L, mask_R, kpt_2d_L, kpt_2d_R, K, img_path):
+        # add one column to kpt_2d for convenience to calculate
+        img_L = np.asarray(img_L).astype(np.uint8)
+        img_R = np.asarray(img_R).astype(np.uint8)
+        hcoords_L = np.concatenate((kpt_2d_L, np.ones((kpt_2d_L.shape[0], 1))), axis=-1)
+        hcoords_R = np.concatenate((kpt_2d_R, np.ones((kpt_2d_R.shape[0], 1))), axis=-1)
+        foreground = np.sum(mask_L)
+        if foreground > 0:
+            img_L, img_R, mask_L, mask_R, hcoords_L, hcoords_R = _augmentation_keep_epipolar_constraints(img_L,img_R, mask_L, mask_R, hcoords_L, hcoords_R, K, self.args)
+
+        kpt_2d_L = hcoords_L[:, :2]
+        kpt_2d_R = hcoords_R[:, :2]
+
+        return img_L, img_R, mask_L, mask_R, kpt_2d_L, kpt_2d_R
 
 
 if __name__ == '__main__':
