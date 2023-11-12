@@ -9,7 +9,7 @@ from lib.train.trainers.pvnet import NetworkWrapper
 from lib.train.trainers.trainer import Trainer
 from lib.train.recorder import Recorder
 from lib.utils.optimizer.lr_scheduler import MultiStepLR
-from lib.evaluators.custom.pvnet_parallel import Evaluator
+from lib.evaluators import make_evaluator
 from lib.datasets import make_data_loader
 from lib.utils.net_utils import load_model, save_model, load_network
 
@@ -39,8 +39,8 @@ def make_optimizer(cfg, params):
     return optimizer, scheduler, recorder
 
 def make_evaluators(cfg):
-    test_evaluator = Evaluator(cfg.result_dir, cfg.test.dataset_dir,is_train=False, suffix='', json_fn = 'test_val.json')
-    train_evaluator = Evaluator(cfg.result_dir, cfg.train.dataset_dir, is_train=True, suffix='')
+    test_evaluator = make_evaluator(cfg, dataset_dir=cfg.test.dataset_dir,is_train=False, suffix='', json_fn = 'test_val.json')
+    train_evaluator = make_evaluator(cfg, dataset_dir=cfg.train.dataset_dir, is_train=True, suffix='')
         
 
     return test_evaluator, train_evaluator

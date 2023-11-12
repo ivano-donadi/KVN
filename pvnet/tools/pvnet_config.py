@@ -122,6 +122,7 @@ _heads_factory = {
     'pvnet': CN({'vote_dim': 18, 'seg_dim': 2}),
     'pvnet_stereo': CN({'vote_dim': 18, 'seg_dim': 2}),
     'pvnet_parallel': CN({'vote_dim': 18, 'seg_dim': 2}),
+    'pvnet_parallel_ours': CN({'vote_dim': 18, 'seg_dim': 2}),
     'ct': CN({'ct_hm': 30, 'wh': 2})
 }
 

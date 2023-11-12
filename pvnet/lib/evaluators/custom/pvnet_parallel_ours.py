@@ -21,10 +21,12 @@ from . import eval_utils
 
 class Evaluator:
 
-    def __init__(self, result_dir, dataset_dir, cls_type = 'default', is_train=True, suffix = '_L', json_fn = None):
+    def __init__(self, result_dir, dataset_dir, cls_type = 'default', is_train=True, suffix = '_L', json_fn = None, img_w=1024, img_h=768):
         self.result_dir = result_dir
         data_root = dataset_dir
         self.cls_type = cls_type
+        self.img_w = img_w
+        self.img_h = img_h
         
         if is_train:
             self.ann_file = os.path.join(data_root, 'train.json')
@@ -37,7 +39,7 @@ class Evaluator:
         self.coco = coco.COCO(self.ann_file)
 
         model_path = os.path.join(data_root, 'model.ply')
-        self.model = pvnet_data_utils.get_ply_model(model_path)
+        self.model = pvnet_data_utils.get_ply_model(model_path) / 1000
         self.diameter = np.loadtxt(os.path.join(data_root, 'diameter.txt')).item()
 
         self.proj2d = []
@@ -68,7 +70,7 @@ class Evaluator:
         pose_gt = np.array(anno['pose'+self.suffix])
         pose_pred = pvnet_pose_utils.pnp(kpt_3d, kpt_2d, K)
         self.proj2d.append(eval_utils.projection_2d(self.model, pose_pred, pose_gt, K))
-        if obj_name in ['ball_0', 'bottle_0', 'bottle_1', 'bottle_2', 'cup_0', 'cup_1']:
+        if obj_name in ['wine_glass', 'glass', 'little_bottle']:
             mean_dist, add = eval_utils.add_metric(self.model, self.diameter, pose_pred, pose_gt, syn= True)
         else:
             mean_dist, add = eval_utils.add_metric(self.model, self.diameter, pose_pred, pose_gt, syn = False)
@@ -86,30 +88,33 @@ class Evaluator:
 
         img_id = int(batch['img_id'][0])
         anno = self.coco.loadAnns(self.coco.getAnnIds(imgIds=img_id))[0]
-        K = np.array(anno['K'])
+        K = np.array(anno['K']).astype(np.float64)
+        ratio = batch['inp_L'][0].detach().cpu().shape[1] / 768
+        pre_mul = np.array([[ratio, 0., (ratio-1)/2],[0, ratio, (ratio-1)/2],[0.,0.,1.]]).astype(np.float64)
+        K = np.matmul(pre_mul, K)
+        #print(ratio, batch['inp_L'][0].detach().cpu().shape)
+
         baseline = anno['baseline']
 
         pose_gt_L = np.array(anno['pose_L'])
         obj_name = anno['cls']
 
-        syn = obj_name in ['ball_0', 'bottle_0', 'bottle_1', 'bottle_2', 'cup_0', 'cup_1']
+        #TODO: change to our objects
+        syn = obj_name in ['wine_glass', 'glass', 'little_bottle']
+
+        #print("syn", syn)
+        #print("obj", obj_name)
 
         offset_L = batch['offset_L'][0,None,:].detach().cpu().numpy()
         offset_R = batch['offset_R'][0,None,:].detach().cpu().numpy()
-        kpt_2d_L = output['kpt_2d_L'][0].detach().cpu().numpy() + offset_L
-        kpt_2d_R = output['kpt_2d_R'][0].detach().cpu().numpy() + offset_R
+        kpt_2d_L = (output['kpt_2d_L'][0].detach().cpu().numpy() + offset_L).astype(np.float32)
+        kpt_2d_R = (output['kpt_2d_R'][0].detach().cpu().numpy() + offset_R).astype(np.float32)
         var_L = output['var_L'][0].detach().cpu().numpy()
         var_R = output['var_R'][0].detach().cpu().numpy()
         kpt_3d_L = np.concatenate([anno['fps_3d_L'], [anno['center_3d_L']]], axis=0)
         kpt_3d_R = np.concatenate([anno['fps_3d_R'], [anno['center_3d_R']]], axis=0)
 
-        # skip ball_0 image with object completely out of camera view (check for centroid out of image bounds)
-        #print(batch['kpt_2d_L'][0][-1][1], offset_L[0][1])
-        if obj_name == 'ball_0' and batch['kpt_2d_L'][0][-1][1] > 126:
-            print("skipping emplty ball_0 image")
-            return
-
-        print(kpt_3d_L.shape, kpt_3d_L.dtype, K.dtype)
+        #print(kpt_2d_L.dtype, var_L.dtype, kpt_3d_L.dtype, K.dtype)
 
         initial_guess_L, guess_cost_L = eval_utils.initial_guess_from_variance(var_L, kpt_2d_L, kpt_3d_L, K)
         initial_guess_R, guess_cost_R = eval_utils.initial_guess_from_variance(var_R, kpt_2d_R, kpt_3d_R, K)
@@ -119,7 +124,7 @@ class Evaluator:
             initial_guess = initial_guess_R
             initial_guess[0,3] -= baseline
 
-        mae, cm2, cmd5, add, proj2d, pose_pred_it = eval_utils.it_pnp_metrics(self.model, self.diameter, K, baseline, 720, 1280, kpt_2d_L, kpt_2d_R, kpt_3d_L, var_L, var_R, pose_gt_L,syn=syn, initial_guess = initial_guess, obj_name = obj_name)
+        mae, cm2, cmd5, add, proj2d, pose_pred_it = eval_utils.it_pnp_metrics(self.model, self.diameter, K, baseline, batch['inp_L'][0].detach().cpu().shape[1], batch['inp_L'][0].detach().cpu().shape[2], kpt_2d_L, kpt_2d_R, kpt_3d_L, var_L, var_R, pose_gt_L,syn=syn, initial_guess = initial_guess, obj_name = None)
 
         good_mask = eval_utils.mask_iou(output, batch)
         if False: #not good_mask and mae > 0.05: 

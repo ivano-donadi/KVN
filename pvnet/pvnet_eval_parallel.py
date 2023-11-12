@@ -6,7 +6,7 @@ import json
 import tqdm
 
 from lib.networks.pvnet.resnet18  import get_res_pvnet
-from lib.evaluators.custom.pvnet_parallel import Evaluator
+from lib.evaluators import make_evaluator
 from lib.datasets import make_data_loader
 
 
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     network.eval()
 
     data_loader = make_data_loader(cfg, is_train=False, json_fn="test.json", LR_split='')
-    evaluator = Evaluator(cfg.result_dir, cfg.test.dataset_dir, is_train=False)
+    evaluator = make_evaluator(cfg, dataset_dir=cfg.test.dataset_dir, is_train=False, suffix='', json_fn = 'test.json')
 
 
     for batch in tqdm.tqdm(data_loader):
