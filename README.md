@@ -54,7 +54,13 @@ $ python3 setup.py build_ext --inplace --force
 
 ## TTD dataset
 
-[Here](https://drive.google.com/file/d/16eMhx-CNBS-n4zhKSAVQ2QaVTSrZmeMM/view?usp=sharing) you can download the Transparent Tableware Dataset.
+[Here](https://drive.google.com/file/d/16eMhx-CNBS-n4zhKSAVQ2QaVTSrZmeMM/view?usp=sharing) you can download the zip file for the Transparent Tableware Dataset. Such file should be unzipped inside the `data` folder so that the resulting directory tree becomes `data/tdd`. To perform training and evaluation on TTD you must first create annotation files with the script `pvnet/custom_dataset_annotator_utils/annotate_object.py`. To run it you should provide the path to the TTD dataset, the name of the object of interest (the possible choices are `wine_glass`, `coffee_cup`, `candle_holder`, `glass`, `little_bottle`), and the percentage of images to use for validation and test. For example, to annotate the `wine_glass` object you can run the following command (assuming you are inside the `pvnet` folder):
+
+```bash
+$ python3 custom_dataset_annotator_utils/annotate_object.py -d ~/KVN/data/tdd -o wine_glass -v 0.2 -t 0.2
+```
+
+For instructions on how to perform training and evaluation, you can follow the instructions in the next sections, taking care to use the appropriate config files for TDD (`configs/ours_vanilla.yaml`, `configs/ours_dsac.yaml`) and using the path to `KVN/data/tdd/object name` as the dataset directory, substituting object name with the appropriate string, such as `wine_glass`.
 
 ## TOD dataset
 
