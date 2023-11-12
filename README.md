@@ -52,6 +52,10 @@ $ cd ../uncertainty_pnp
 $ python3 setup.py build_ext --inplace --force
 ~~~
 
+## TTD dataset
+
+[Here](https://drive.google.com/file/d/16eMhx-CNBS-n4zhKSAVQ2QaVTSrZmeMM/view?usp=sharing) you can download the Transparent Tableware Dataset.
+
 ## TOD dataset
 
 To replicate the experiments presented in the paper you will first need to download the original TOD dataset, available at  [here](https://sites.google.com/view/keypose/home). The zip file for each object should be unzipped inside the `data/` directory and renamed to add a `_orig` suffix. For example, the original dataset for object 'heart_0' should be in `data/heart_0_orig`. To convert TOD's annotation into KVN format, you can use the script `convert_all_textures` located inside `pvnet/tod_utils`, which requires the *absolute* path to the data folder and the name of the object. Assuming to have a terminal window inside `pvnet/tod_utils`, and assuming that we want to convert the dataset for the object `heart_0`, the command to use is the following:
