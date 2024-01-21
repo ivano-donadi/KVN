@@ -1,3 +1,8 @@
+project( obj_loc )
+message("** Project ${PROJECT_NAME} **")
+
+cmake_minimum_required(VERSION 3.0)
+
 # Setup the default build environment
 SET(CMAKE_AR "gcc-ar")
 SET(CMAKE_NM "gcc-nm")
