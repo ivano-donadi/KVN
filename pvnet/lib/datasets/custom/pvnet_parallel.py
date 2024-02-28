@@ -30,7 +30,7 @@ class Dataset(data.Dataset):
     def read_data_suffix(self, anno, id, suffix):
         path = self.coco.loadImgs(int(id))[0]['file_name'+suffix]
         inp = Image.open(path)
-        kpt_2d = np.concatenate([anno['fps_2d'+suffix], [anno['center_2d'+suffix]]], axis=0)
+        kpt_2d = np.concatenate([anno['fps_2d'+suffix], anno['center_2d'+suffix]], axis=0)
 
         #cls_idx = linemod_config.linemod_cls_names.index(anno['cls']) + 1
         if anno['mask_path'+suffix] == 'dummy_mask' :
