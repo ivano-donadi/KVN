@@ -32,7 +32,7 @@ if __name__ == "__main__":
     print(bg_dirs)
 
     obj_class = args.object
-    obj_name = os.path.join(data_dir, obj_class+".ply")
+    obj_name = os.path.join(data_dir, "models/"+obj_class+".ply")
     if not os.path.exists(obj_name):
         raise  ValueError("Object file not found: {}".format(obj_name))
     shutil.copyfile(obj_name, os.path.join(output_dir, "model.ply"))
