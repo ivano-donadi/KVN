@@ -37,7 +37,7 @@ train:
     kp_loss_threshold: 1000000.
     kp_loss_beta: 100.
     soft_ap_beta: 0.1
-    ransac_rounds: 256
+    ransac_rounds: 128
     target_entropy: 6
     dsac_alpha: 0.1
     dsac_beta: 0.1
