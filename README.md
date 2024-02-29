@@ -52,16 +52,6 @@ $ cd ../uncertainty_pnp
 $ python3 setup.py build_ext --inplace --force
 ~~~
 
-## TTD dataset
-
-[Here](https://drive.google.com/file/d/16eMhx-CNBS-n4zhKSAVQ2QaVTSrZmeMM/view?usp=sharing) you can download the zip file for the Transparent Tableware Dataset. Such file should be unzipped inside the `data` folder so that the resulting directory tree becomes `data/tdd`. To perform training and evaluation on TTD you must first create annotation files with the script `pvnet/custom_dataset_annotator_utils/annotate_object.py`. To run it you should provide the path to the TTD dataset, the name of the object of interest (the possible choices are `wine_glass`, `coffee_cup`, `candle_holder`, `glass`, `little_bottle`), and the percentage of images to use for validation and test. For example, to annotate the `wine_glass` object you can run the following command (assuming you are inside the `pvnet` folder):
-
-```bash
-$ python3 custom_dataset_annotator_utils/annotate_object.py -d ~/KVN/data/tdd -o wine_glass -v 0.2 -t 0.2
-```
-
-For instructions on how to perform training and evaluation, you can follow the instructions in the next sections, taking care to use the appropriate config files for TDD (`configs/ours_vanilla.yaml`, `configs/ours_dsac.yaml`) and using the path to `KVN/data/tdd/object name` as the dataset directory, substituting object name with the appropriate string, such as `wine_glass`.
-
 ## TOD dataset
 
 To replicate the experiments presented in the paper you will first need to download the original TOD dataset, available at  [here](https://sites.google.com/view/keypose/home). The zip file for each object should be unzipped inside the `data/` directory and renamed to add a `_orig` suffix. For example, the original dataset for object 'heart_0' should be in `data/heart_0_orig`. To convert TOD's annotation into KVN format, you can use the script `convert_all_textures` located inside `pvnet/tod_utils`, which requires the *absolute* path to the data folder and the name of the object. Assuming to have a terminal window inside `pvnet/tod_utils`, and assuming that we want to convert the dataset for the object `heart_0`, the command to use is the following:
@@ -176,4 +166,17 @@ $ python3 pvnet_test_localization_parallel.py -m ../results/best_model/89.pth -d
 
 ## Trained models
 
-We provide the trained models for all 15 TOD objects at: ### TODO: add link
+We provide the trained models for all 2 TOD objects at this [link](https://drive.google.com/drive/folders/13WK7nyGZR5hAJOS7R59WXsAywj0zKN6o?usp=sharing) 
+
+## TTD dataset
+
+[Here](https://doi.org/10.5281/zenodo.10580443) you can download the dataset archive (ttd.zip) of the Transparent Tableware Dataset (TTD) along with the documentation of the dataset. Unizp the archive file and prepare the annotations in KVN format (the one used by PVNet) by using the ttd_converter.py script located inside the `pvnet/ttd_utils` directory. We refer here to the standard 'mixed' benchmark (i.e., dataset partitioning), the same used in the experiments of the paper, whose files are found in the following ttd directory default_benchmarks/stereo/mixed. For example, assuming the ttd dataset has been extracted in the data/ directory, to convert the train, validation, and test subsets for the  object 'glass' and save the annotations into the 'data/ttd_annotations' directory, run the script 3 times with the following parameters:
+```bash
+$ python3 pvnet/ttd_utilsttd_converter.py -i data/ttd/default_benchmarks/stereo/mixed/train.json -n glass -d data/ttd -o data/ttd_annotations
+$ python3 pvnet/ttd_utilsttd_converter.py -i data/ttd/default_benchmarks/stereo/mixed/test_val.json -n glass -d data/ttd -o data/ttd_annotations
+$ python3 pvnet/ttd_utilsttd_converter.py -i data/ttd/default_benchmarks/stereo/mixed/test_val.json -n glass -d data/ttd -o data/ttd_annotations
+```
+To convert the annotations for the other TTD dataset, replace the object name 'glass' with one of 'candle_holder', 'coffee_cup', 'little_bottle', or 'wine_glass'.
+
+For instructions on how to perform training and evaluation, you can follow the instructions in the next sections, taking care to use the appropriate config files for TDD (`configs/ours_vanilla.yaml`, `configs/ours_dsac.yaml`) and using the path to `KVN/data/tdd/object name` as the dataset directory, substituting object name with the appropriate string, such as `wine_glass`.
+
