@@ -1,7 +1,14 @@
 # KVN: Keypoints Voting Network with Differentiable RANSAC for Stereo Pose Estimation
 
+This repository includes the code for the paper [KVN: Keypoints Voting Network with Differentiable RANSAC for Stereo Pose Estimation](https://arxiv.org/pdf/2307.11543.pdf). A large part of it has been taken from the [code](https://github.com/zju3dv/pvnet) of the paper:
 
-Citation
+[PVNet: Pixel-wise Voting Network for 6DoF Pose Estimation](https://arxiv.org/pdf/1812.11788.pdf)\
+Sida Peng, Yuan Liu, Qixing Huang, Xiaowei Zhou, Hujun Bao\
+CVPR 2019 
+
+Actually, KVN builds upon PVNet, with modifications to integrate the differentiable RANSAC layer and to address a stereo camera setup.
+
+## Citation
 
 If you use this code in your research, please cite the following paper:
 
