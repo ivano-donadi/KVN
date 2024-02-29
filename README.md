@@ -4,33 +4,10 @@
 ## Prerequisites (tested on Ubuntu 20.04)
 
  - Python 3.8
- - CUDA drivers (tested on version 11.6)
- - cuDNN libraries (tested on version 8.7.0)
- - ceres solver (tested on version 1.14.0)
+ - CUDA drivers (tested on version 11.3)
+ - cuDNN libraries (tested on version 8.9.7)
 
-### required libraries
-
-~~~bash
-$ sudo apt-get install build-essential git cmake libgoogle-glog-dev libdime-dev
-$ sudo apt-get install libatlas-base-dev libeigen3-dev libsuitesparse-dev libopencv-dev
-$ sudo apt-get install libpcl-dev libyaml-cpp-dev libgtest-dev libfreeimage-dev libglew-dev
-$ sudo apt-get install libglfw3-dev libglm-dev meshlab python3-pip python3-numpy python3-tk
-~~~
-
-## Installation
-
-Open a terminal window inside the cloned repository.
-
-### Build the C++ stuff
-
-~~~bash
-$ mkdir build
-$ cd build/
-$ cmake ..
-$ make -j3
-~~~
-
-### Install the Python3 prerequisistes
+### Python3 prerequisistes
 
 ~~~bash
 $ pip3 install --no-cache-dir -r pvnet/requirements.txt
