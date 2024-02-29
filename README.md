@@ -1,6 +1,24 @@
 # KVN: Keypoints Voting Network with Differentiable RANSAC for Stereo Pose Estimation
 
 
+Citation
+
+If you use this code in your research, please cite the following paper:
+
+I. Donadi and A. Pretto, ”KVN: Keypoints Voting Network with Differentiable RANSAC for Stereo Pose Estimation,” in IEEE Robotics and Automation Letters, 2024, doi: 10.1109/LRA.2024.3367508.
+
+BibTeX entry:
+~~~
+@article{dp_RA-L2024,
+  title={{KVN}: {K}eypoints Voting Network with
+  Differentiable {RANSAC} for Stereo Pose Estimation},
+  author={Donadi, Ivano and Pretto, Alberto},
+  journal={IEEE Robotics and Automation Letters},
+  year = {2024},
+  doi={10.1109/LRA.2024.3367508}
+}
+~~~
+
 ## Prerequisites (tested on Ubuntu 20.04)
 
  - Python 3.8
