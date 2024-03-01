@@ -38,6 +38,7 @@ BibTeX entry:
 $ pip3 install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0 --extra-index-url https://download.pytorch.org/whl/cu113
 $ pip3 install --no-cache-dir -r /requirements.txt
 ~~~
+(More updated versions of the packages may work as well, but have not been tested).
 
 ### Build the Cython stuff:
 
@@ -57,7 +58,7 @@ $ python3 setup.py build_ext --inplace --force
 
 ## TOD dataset
 
-To replicate the experiments presented in the paper you will first need to download the original TOD dataset, available at  [here](https://sites.google.com/view/keypose/home). The zip file for each object should be unzipped inside the `data/` directory and renamed to add a `_orig` suffix. For example, the original dataset for object 'heart_0' should be in `data/heart_0_orig`. To convert TOD's annotation into KVN format, you can use the script `convert_all_textures` located inside `/tod_utils`, which requires the *absolute* path to the data folder and the name of the object. Assuming to have a terminal window inside `/tod_utils`, and assuming that we want to convert the dataset for the object `heart_0`, the command to use is the following:
+To replicate the experiments presented in the paper you will first need to download the original TOD dataset, available at  [here](https://sites.google.com/view/keypose/home). The zip file for each object should be unzipped inside the `data/` directory and renamed to add a `_orig` suffix. For example, the original dataset for object 'heart_0' should be in `data/heart_0_orig`. To convert TOD's annotation into KVN format  (the one used by PVNet), you can use the script `convert_all_textures` located inside `/tod_utils`, which requires the *absolute* path to the data folder and the name of the object. Assuming to have a terminal window inside `/tod_utils`, and assuming that we want to convert the dataset for the object `heart_0`, the command to use is the following:
 
 ```bash
 $ sh convert_all_textures.sh ~/KVN/data heart_0
@@ -173,7 +174,7 @@ We provide the trained models for all 2 TOD objects at this [link](https://drive
 
 ## TTD dataset
 
-[Here](https://doi.org/10.5281/zenodo.10580443) you can download the dataset archive (ttd.zip) of the Transparent Tableware Dataset (TTD) along with the documentation of the dataset. Unizp the archive file and prepare the annotations in KVN format (the one used by PVNet) by using the ttd_converter.py script located inside the `/ttd_utils` directory. We refer here to the standard 'mixed' benchmark (i.e., dataset partitioning), the same used in the experiments of the paper, whose files are found in the following ttd directory default_benchmarks/stereo/mixed. For example, assuming the ttd dataset has been extracted in the data/ directory, to convert the train, validation, and test subsets for the  object 'glass' and save the annotations into the 'data/ttd_annotations' directory, run the script 3 times with the following parameters:
+[Here](https://doi.org/10.5281/zenodo.10580443) you can download the dataset archive (ttd.zip) of the Transparent Tableware Dataset (TTD) along with the documentation of the dataset. Unizp the archive file and prepare the annotations in KVN format by using the ttd_converter.py script located inside the `/ttd_utils` directory. We refer here to the standard 'mixed' benchmark (i.e., dataset partitioning), the same used in the experiments of the paper, whose files are found in the following ttd directory default_benchmarks/stereo/mixed. For example, assuming the ttd dataset has been extracted in the data/ directory, to convert the train, validation, and test subsets for the  object 'glass' and save the annotations into the 'data/ttd_annotations' directory, run the script 3 times with the following parameters:
 ```bash
 $ python3 /ttd_utilsttd_converter.py -i data/ttd/default_benchmarks/stereo/mixed/train.json -n glass -d data/ttd -o data/ttd_annotations
 $ python3 /ttd_utilsttd_converter.py -i data/ttd/default_benchmarks/stereo/mixed/test_val.json -n glass -d data/ttd -o data/ttd_annotations
