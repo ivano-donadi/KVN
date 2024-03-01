@@ -10,7 +10,7 @@ CVPR 2019
 
 ## Citation
 
-If you use this code in your research, please cite the following paper:
+If you use this code or the [Transparent Tableware Dataset (TTD)](https://doi.org/10.5281/zenodo.10580443) in your research, please cite the following paper:
 
 I. Donadi and A. Pretto, ”KVN: Keypoints Voting Network with Differentiable RANSAC for Stereo Pose Estimation,” in IEEE Robotics and Automation Letters, 2024, doi: 10.1109/LRA.2024.3367508.
 
