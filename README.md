@@ -40,6 +40,25 @@ $ pip3 install --no-cache-dir -r /requirements.txt
 ~~~
 (More updated versions of the packages may work as well, but have not been tested).
 
+### Required libraries
+
+~~~bash
+$ sudo apt-get install build-essential git cmake libgoogle-glog-dev libceres-dev
+$ sudo apt-get install libatlas-base-dev libeigen3-dev libsuitesparse-dev libopencv-dev
+$ sudo apt-get install libyaml-cpp-dev python3-pip python3-numpy python3-tk
+~~~
+
+### Build the C++ stuff
+
+~~~bash
+$ cd iterative_pnp_stereo/
+$ mkdir build
+$ cd build/
+$ cmake ..
+$ make -j3
+$ cd ../..
+~~~
+
 ### Build the Cython stuff:
 
 ~~~bash
