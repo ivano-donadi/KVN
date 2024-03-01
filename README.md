@@ -8,6 +8,9 @@ CVPR 2019
 
 (we have kept the names of most scripts unchanged). Actually, KVN builds upon PVNet, with modifications to integrate the differentiable RANSAC layer and to address a stereo camera setup.
 
+If you want to learn more, you may also check out the paper video:\
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/j_41WaTCdHs/0.jpg)](https://www.youtube.com/watch?v=j_41WaTCdHs)
+
 ## Citation
 
 If you use this code or the [Transparent Tableware Dataset (TTD)](https://doi.org/10.5281/zenodo.10580443) in your research, please cite the following paper:
