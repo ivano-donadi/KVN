@@ -117,7 +117,7 @@ $ python3 pvnet_train_parallel.py -h
     You need at least to provide an input training dataset and to specify the output directory where the trained models will be stored.The best model checkpoint will be stored inside the best_model subdirectory
 ```
 
-For example, it is possible to train the model on textures 1-9 of object heart_0 and store the trained models in the results/ directory by using:
+For example, it is possible to train the model on textures 1-9 of object heart_0 and store the trained models in the results/ directory (to be manually created) by using:
 
 ```bash
 python3 pvnet_train_parallel.py -d data/sy_datasets/heart_0_stereo_0 -m results -n 150 -e 10 -s 10 --cfg_file configs/custom_dsac.yaml
@@ -205,9 +205,21 @@ $ python3 ttd_utils/ttd_converter.py -i data/ttd/default_benchmarks/stereo/mixed
 $ python3 ttd_utils/ttd_converter.py -i data/ttd/default_benchmarks/stereo/mixed/test_val.json -n glass -d data/ttd -o data/ttd_annotations
 $ python3 ttd_utils/ttd_converter.py -i data/ttd/default_benchmarks/stereo/mixed/test_val.json -n glass -d data/ttd -o data/ttd_annotations
 ```
-To convert the annotations for the other TTD dataset, replace the object name 'glass' with one of 'candle_holder', 'coffee_cup', 'little_bottle', or 'wine_glass'.
+To convert the annotations for the other TTD dataset, replace the object name 'glass' ('-n' option) with one of 'candle_holder', 'coffee_cup', 'little_bottle', or 'wine_glass'.
 
-For instructions on how to perform training and evaluation, you can follow the instructions in the next sections, taking care to use the appropriate config files for TDD (`configs/ours_vanilla.yaml`, `configs/ours_dsac.yaml`) and using the path to `KVN/data/tdd/object name` as the dataset directory, substituting object name with the appropriate string, such as `wine_glass`.
+### KVN training and evaluation
+
+For detailed instructions on how to perform training and evaluation, you can follow the instructions in the previous TOD sections, taking care to use the appropriate config files for TTD (`configs/ours_dsac.yaml` for KVN and `configs/ours_vanilla.yaml` for PVNet) and using the path to the corresponding annotations directory. For example, having done the conversion as above for the 'glass' object, the directory with the annotations for this object is `data/ttd_annotations/glass`, and so on. In this case, you can train KVN with the following command:
+
+```bash
+$ python3 pvnet_train_parallel.py -d data/ttd_annotations/glass -m results_kvn/glass -n 150 -e 10 -s 10 --cfg_file configs/ours_dsac.yaml
+```
+where the trained models will be stored in this case in the results_kvn/glass directory (to be manually created).\
+Supposing that the best model after training is 119.pth, you can then evaluate it in the test subset by using in this case the following command:
+
+```bash
+$ python3 pvnet_eval_parallel.py -d data/ttd_annotations/glass -m results_kvn/glass/best_model/119.pth --cfg_file configs/ours_dsac.yaml
+```
 
 ### Trained models
 
