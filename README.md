@@ -47,7 +47,7 @@ $ sudo apt-get install build-essential git cmake libgoogle-glog-dev libceres-dev
 $ sudo apt-get install libatlas-base-dev libeigen3-dev libsuitesparse-dev libopencv-dev
 $ sudo apt-get install libyaml-cpp-dev python3-pip python3-numpy python3-tk
 ~~~
-
+(Please note: only Ceres Solver v.1.14.0 or older version is supported)
 ### Build the C++ stuff
 
 ~~~bash
