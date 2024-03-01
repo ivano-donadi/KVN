@@ -90,9 +90,9 @@ if __name__ == "__main__":
     input_json = json.load(open(args.input))
     obj_class = args.name
     base_dir = args.base_dir
-    mesh_file = os.path.join(base_dir, "ttd", "models",obj_class+".ply")
+    mesh_file = os.path.join(base_dir, "models",obj_class+".ply")
     output_dir = os.path.join(args.output, obj_class)
-    camera_mat= os.path.join(base_dir, "ttd", "cameras_params.yml") 
+    camera_mat= os.path.join(base_dir, "cameras_params.yml") 
     is_symmetric= args.symmetric
     if not os.path.exists(output_dir):
         os.makedirs(output_dir, exist_ok =True)
