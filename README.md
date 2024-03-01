@@ -6,7 +6,7 @@ This repository includes the code for the paper [KVN: Keypoints Voting Network w
 Sida Peng, Yuan Liu, Qixing Huang, Xiaowei Zhou, Hujun Bao\
 CVPR 2019 
 
-Actually, KVN builds upon PVNet, with modifications to integrate the differentiable RANSAC layer and to address a stereo camera setup.
+(we have kept the names of most scripts unchanged). Actually, KVN builds upon PVNet, with modifications to integrate the differentiable RANSAC layer and to address a stereo camera setup.
 
 ## Citation
 
