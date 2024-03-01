@@ -73,6 +73,7 @@ $ cd ../fps
 $ python3 setup.py build_ext --inplace --force
 $ cd ../uncertainty_pnp
 $ python3 setup.py build_ext --inplace --force
+$ cd ../../..
 ~~~
 
 ## TOD dataset
@@ -122,7 +123,7 @@ For example, it is possible to train the model on textures 1-9 of object heart_0
 python3 pvnet_train_parallel.py -d data/sy_datasets/heart_0_stereo_0 -m results -n 150 -e 10 -s 10 --cfg_file configs/custom_dsac.yaml
 ```
 
-This command will train the model using DSAC as the training loss and will save a checkpoint every 10 epochs inside the results folder, named 9.pth, 19.pth and so on. The checkpoint with the best validation parameters is saved inside `results/best_model`. To perform the same training but with a standard PVNet network, you simply need to choose `configs/custom_vanilla.yaml` as the configuration file. Additionally, it is possible to perform random background augmentation by explicating the `--bkg_imgs` option with the path to the backgrounds dataset. We provide the set of backgrounds that were used in our experiments at [this link](https://drive.google.com/file/d/1lzxR0A8j0-2dvLwC3lPA-UcYSOw8uvwY/view?usp=sharing). 
+This command will train the model using differentiable RANSAC (DSAC) as the training loss and will save a checkpoint every 10 epochs inside the results folder, named 9.pth, 19.pth and so on. The checkpoint with the best validation parameters is saved inside `results/best_model`. To perform the same training but with a standard PVNet network, you simply need to choose `configs/custom_vanilla.yaml` as the configuration file. Additionally, it is possible to perform random background augmentation by explicating the `--bkg_imgs` option with the path to the backgrounds dataset. We provide the set of backgrounds that were used in our experiments at [this link](https://drive.google.com/file/d/1lzxR0A8j0-2dvLwC3lPA-UcYSOw8uvwY/view?usp=sharing). 
 In case of correct execution, the output of this script will be the network's training process and the evaluation results on the validation set at the specified epochs interval.
 
 ### KVN evaluation
@@ -134,9 +135,6 @@ $ python3 pvnet_eval_parallel.py -h
     usage: pvnet_eval_parallel.py [-h] -d DATASET_DIR -m MODEL [-o OUTPUT_DIR] [--num_iters NUM_ITERS] [--cfg_file CFG_FILE] ...
 
     KVN evaluation tool
-
-    positional arguments:
-      opts
 
     optional arguments:
       -h, --help            show this help message and exit
@@ -197,7 +195,7 @@ $ python3 pvnet_test_localization_parallel.py -m ../results/best_model/89.pth -d
 
 ### Trained models
 
-We provide the trained models for all 2 TOD objects at this [link](https://drive.google.com/drive/folders/13WK7nyGZR5hAJOS7R59WXsAywj0zKN6o?usp=sharing) 
+We provide the trained models for 2 TOD objects at this [link](https://drive.google.com/drive/folders/13WK7nyGZR5hAJOS7R59WXsAywj0zKN6o?usp=sharing) 
 
 ## TTD dataset
 
@@ -211,3 +209,6 @@ To convert the annotations for the other TTD dataset, replace the object name 'g
 
 For instructions on how to perform training and evaluation, you can follow the instructions in the next sections, taking care to use the appropriate config files for TDD (`configs/ours_vanilla.yaml`, `configs/ours_dsac.yaml`) and using the path to `KVN/data/tdd/object name` as the dataset directory, substituting object name with the appropriate string, such as `wine_glass`.
 
+### Trained models
+
+We provide the trained models for KVN for all TTD objects at this [link](https://drive.google.com/file/d/1a-Q5Vj8htTYEKHPK7XLTS9u_TH3G-BzD/view?usp=sharing) 
