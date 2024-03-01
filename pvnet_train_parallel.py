@@ -157,7 +157,7 @@ def main(cfg):
 
 if __name__ == "__main__":
     
-    parser = argparse.ArgumentParser(description='KVNet training tool',
+    parser = argparse.ArgumentParser(description='KVN training tool',
                                      epilog="You need at least to provide an input training dataset "
                                             "and to specify the output directory where the trained models will be stored."
                                             "The best model checkpoint will be stored inside the best_model subdirectory")

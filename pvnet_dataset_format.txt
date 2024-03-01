@@ -1,4 +1,4 @@
-PVNet Dtasets
+PVNet Datasets Format
 
 A typical PVNet  dataset folder should containt 3 empty foldera (mask/, pose/, rgb/) with mask, rgb images and ground truth positions of the objects, respectively. The folder should also contain the 3D cad model of the object (with name model.ply), a file that just reports the diameter in meters of a sphere inscribing the object (diameter.txt), and file that reports the calibration matrix K in space separataed format, with column-major order:
 

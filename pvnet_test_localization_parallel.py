@@ -19,7 +19,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--dataset_dir', 
                         help='Input directory containing the test dataset', required=True)    
     parser.add_argument('-m', '--model',  
-                        help='KVNet trained model', required=True)
+                        help='KVN trained model', required=True)
     parser.add_argument("--cfg_file", 
                         help='Low level configuration file, DO NOT CHANGE THIS PARAMETER IF YOU ARE NOT SURE (default = configs/custom_dsac.yaml)', 
                         default="configs/custom_dsac.yaml", type=str)

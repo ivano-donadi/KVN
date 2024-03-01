@@ -13,18 +13,18 @@ from lib.datasets import make_data_loader
 
 if __name__ == "__main__":
     
-    parser = argparse.ArgumentParser(description='KVNet evaluation tool',
+    parser = argparse.ArgumentParser(description='KVN evaluation tool',
                                      epilog="You need at least to provide an (annotated) input test dataset "
-                                            "and a KVNet trained model")
+                                            "and a KVN trained model")
 
     parser.add_argument('-d', '--dataset_dir', 
                         help='Input directory containing the test dataset', required=True)    
     parser.add_argument('-m', '--model',  
-                        help='KVNet trained model', required=True)
+                        help='KVN trained model', required=True)
     parser.add_argument('-o', '--output_dir',  
-                        help='Output dir')
+                        help='Optional output dir where to save the results')
     parser.add_argument('--num_iters',  
-                        help='Number of evaluation iterations', default=10)
+                        help='Number of evaluation iterations to average over (default=10)', default=10)
     parser.add_argument("--cfg_file", 
                         help='Low level configuration file, DO NOT CHANGE THIS PARAMETER IF YOU ARE NOT SURE (default = configs/custom_dsac.yaml)', 
                         default="configs/custom_dsac.yaml", type=str)
