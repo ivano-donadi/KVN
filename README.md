@@ -24,7 +24,10 @@ BibTeX entry:
   Differentiable {RANSAC} for Stereo Pose Estimation},
   author={Donadi, Ivano and Pretto, Alberto},
   journal={IEEE Robotics and Automation Letters},
-  year = {2024},
+  year={2024},
+  volume={9},
+  number={4},
+  pages={3498-3505},
   doi={10.1109/LRA.2024.3367508}
 }
 ~~~
