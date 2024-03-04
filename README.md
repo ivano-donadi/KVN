@@ -15,7 +15,7 @@ If you want to learn more, you may also check out the paper video:\
 
 If you use this code or the [Transparent Tableware Dataset (TTD)](https://doi.org/10.5281/zenodo.10580443) in your research, please cite the following paper:
 
-I. Donadi and A. Pretto, ”KVN: Keypoints Voting Network with Differentiable RANSAC for Stereo Pose Estimation,” in IEEE Robotics and Automation Letters, 2024, doi: 10.1109/LRA.2024.3367508.
+I. Donadi and A. Pretto, "KVN: Keypoints Voting Network with Differentiable RANSAC for Stereo Pose Estimation," in IEEE Robotics and Automation Letters, vol. 9, no. 4, pp. 3498-3505, April 2024, doi: 10.1109/LRA.2024.3367508.
 
 BibTeX entry:
 ~~~
